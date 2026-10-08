@@ -32,6 +32,27 @@ Feature: Use the site with the RSMAX theme
     And I am on the "Project management" course page
     And ".rsmax-footer" "css_element" should exist
 
+  Scenario: The site home opens with the name of the site, a course search and the courses
+    # Moodle 5.3 ships with the site home turned off.
+    Given the following config values are set as admin:
+      | enablemyhome    | 1 |
+      | defaulthomepage | 0 |
+    When I log in as "student1"
+    And I am on site homepage
+    Then I should see "Acceptance test site" in the ".rsmax-homehero" "css_element"
+    And "Search courses" "field" should exist in the ".rsmax-homehero" "css_element"
+    And "All courses" "link" should exist in the ".rsmax-homehero" "css_element"
+    And I should see "Project management"
+
+  Scenario: The opening of the site home can be turned off
+    Given the following config values are set as admin:
+      | enablemyhome    | 1 |             |
+      | defaulthomepage | 0 |             |
+      | homehero        | 0 | theme_rsmax |
+    When I log in as "student1"
+    And I am on site homepage
+    Then ".rsmax-homehero" "css_element" should not exist
+
   Scenario: An administrator changes a setting of the theme
     # Moodle 5.3 ships with the site home turned off.
     Given the following config values are set as admin:

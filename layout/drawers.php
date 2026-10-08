@@ -94,6 +94,15 @@ foreach (THEME_RSMAX_LANDING_REGIONS as $region) {
     }
 }
 
+// The site home opens with the name of the site and a search box, unless somebody has built
+// it with landing blocks, which bring their own opening.
+$homehero = false;
+$wantshomehero = !isset($PAGE->theme->settings->homehero) || !empty($PAGE->theme->settings->homehero);
+if ($PAGE->pagelayout == 'frontpage' && $wantshomehero && !\theme_rsmax\local\home_hero::is_built_with_blocks($PAGE)) {
+    $homehero = \theme_rsmax\local\home_hero::export($PAGE->theme->settings);
+    $extraclasses[] = 'rsmax-hashomehero';
+}
+
 $bodyattributes = $OUTPUT->body_attributes($extraclasses);
 $forceblockdraweropen = $OUTPUT->firstview_fakeblocks();
 
@@ -372,6 +381,7 @@ $templatecontext = [
     'dashboard' => $dashboard,
     'coursehero' => $coursehero,
     'assistantholder' => $assistantholder,
+    'homehero' => $homehero,
 ];
 
 echo $OUTPUT->render_from_template('theme_rsmax/drawers', $templatecontext);

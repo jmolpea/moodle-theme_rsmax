@@ -887,6 +887,106 @@ body.pagelayout-frontpage {
         isolation: isolate;
     }
 
+    // The opening the theme gives a home page that has no landing blocks: the same lit, dark
+    // surface, with the name of the site, a search box and the way to the catalogue.
+    $homehero-bg: if($rsmax-hero-bg != null, $rsmax-hero-bg, $rsmax-ink);
+    $homehero-glow: if($rsmax-hero-glow != null, $rsmax-hero-glow, $primary);
+
+    .rsmax-homehero {
+        position: relative;
+        padding: clamp(4rem, 9vw, 7rem) $rsmax-band-x clamp(4rem, 9vw, 6.5rem);
+        color: $white;
+        background:
+            radial-gradient(55rem 30rem at 85% 10%, rgba($homehero-glow, .36), transparent 62%),
+            radial-gradient(45rem 26rem at 5% 100%, rgba($homehero-glow, .24), transparent 60%),
+            $homehero-bg;
+        text-align: center;
+    }
+
+    .rsmax-homehero-inner {
+        max-width: 46rem;
+        margin: 0 auto;
+    }
+
+    .rsmax-homehero-title {
+        margin: 0 0 .75rem;
+        color: $white;
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-weight: 800;
+        line-height: 1.08;
+        letter-spacing: -.03em;
+    }
+
+    .rsmax-homehero-text {
+        margin: 0 auto 1.75rem;
+        color: rgba($white, .86);
+        font-size: 1.125rem;
+    }
+
+    .rsmax-homehero-search {
+        position: relative;
+        display: flex;
+        gap: .4rem;
+        max-width: 36rem;
+        margin: 1.75rem auto 1.5rem;
+        padding: .35rem;
+        border-radius: 2.5rem;
+        background: $white;
+
+        .form-control {
+            min-width: 0;
+            padding-left: 2.75rem;
+            border: 0;
+            border-radius: 2rem;
+            color: $rsmax-ink;
+            background: transparent;
+            font-size: 1.0625rem;
+            box-shadow: none;
+        }
+
+        // The box is white whatever the colour mode: so is what is typed in it.
+        .form-control::placeholder {
+            color: rgba($rsmax-ink, .7);
+        }
+
+        .btn {
+            flex: none;
+            padding: .55rem 1.35rem;
+            border-radius: 2rem;
+            font-weight: 600;
+        }
+
+        &:focus-within {
+            outline: 3px solid rgba($homehero-glow, .6);
+            outline-offset: 2px;
+        }
+    }
+
+    .rsmax-homehero-icon {
+        position: absolute;
+        top: 50%;
+        left: 1.25rem;
+        color: rgba($rsmax-ink, .7);
+        transform: translateY(-50%);
+        pointer-events: none;
+
+        .icon {
+            margin: 0;
+        }
+    }
+
+    .rsmax-homehero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .75rem;
+        justify-content: center;
+
+        .btn {
+            padding: .6rem 1.25rem;
+            font-weight: 600;
+        }
+    }
+
     .pluginia-cta {
         justify-content: space-between;
     }

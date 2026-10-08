@@ -97,6 +97,19 @@ if ($ADMIN->fulltree) {
 
     // Site home and landing blocks.
     $page = new admin_settingpage('theme_rsmax_home', $name('homesettings'));
+    $add($page, $checkbox('homehero', 1));
+    $add($page, $text('homeherotitle'));
+    $add($page, new admin_setting_configtextarea(
+        'theme_rsmax/homeherotext',
+        $name('homeherotext'),
+        $desc('homeherotext'),
+        '',
+        PARAM_TEXT
+    ));
+    if (!array_filter(array_keys(core_component::get_plugin_list('block')), fn($block) => str_starts_with($block, 'pluginia_'))) {
+        // Shown only where the landing blocks are not installed.
+        $add($page, $heading('premiuminfo'));
+    }
     $add($page, $heading('homeinfo'));
     $addcolours($page, 'home');
     $settings->add($page);

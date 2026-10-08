@@ -1,5 +1,10 @@
 # Changes
 
+## 1.1.0 (2026-10-08)
+
+- The site home opens with the name of the site, a search box for its courses and a button to the catalogue, followed by what the site shows on its home page. The title and the line under it are settings, and the opening can be turned off.
+- The theme needs no other plugin.
+
 ## 1.0.2 (2026-10-08)
 
 - The buttons that open the side panels touch the content they open; on the home page they hang from the edges of the window.
