@@ -34,7 +34,7 @@
             "next": {"name": "Schedule template", "url": "#"} }
     }
 }}
-<section class="rsmax-coursehero d-print-none" style="--rsmax-banner: url('{{image}}')">
+<section class="rsmax-coursehero d-print-none"{{#image}} style="--rsmax-banner: url('{{image}}')"{{/image}}>
     <div class="rsmax-coursehero-inner">
         <div class="rsmax-coursehero-text">
             {{#category}}<div class="rsmax-coursehero-category">{{{category}}}</div>{{/category}}

@@ -1809,11 +1809,18 @@ body.rsmax-hasstage {
         }
     }
 
+    // The menu of the course sits close to the header above it and to the sections below.
     .secondary-navigation {
-        margin-bottom: .5rem;
+        margin-bottom: 0;
+        padding-bottom: 0;
         border: 0;
         background: none;
         box-shadow: none;
+
+        .navigation .nav-item {
+            height: auto;
+            padding: .25rem 0;
+        }
 
         .navigation,
         .nav-tabs {
@@ -3765,12 +3772,12 @@ $rsmax-index-mark: if($rsmax-index-light, $rsmax-accent, $rsmax-good);
 .rsmax-coursehero {
     position: relative;
     overflow: hidden;
-    margin: 0 $rsmax-main-inset 1.25rem;
+    margin: 0 $rsmax-main-inset .75rem;
     border-radius: $rsmax-sheet-radius;
     color: $white;
     background:
         linear-gradient(100deg, rgba($rsmax-stage-bg, .96) 26%, rgba($rsmax-stage-bg, .58)),
-        var(--rsmax-banner) center / cover no-repeat,
+        var(--rsmax-banner, none) center / cover no-repeat,
         $rsmax-stage-bg;
     isolation: isolate;
 
@@ -4022,6 +4029,14 @@ body.pagelayout-course {
         box-shadow: none;
     }
 
+    // The header of the course starts right under the navigation bar.
+    @include media-breakpoint-up(lg) {
+        #page.drawers .main-inner {
+            margin-top: .5rem;
+            padding-top: 0;
+        }
+    }
+
     #region-main {
         border: 0;
         background: none;
@@ -4035,11 +4050,18 @@ body.pagelayout-course {
         box-shadow: none;
     }
 
+    // The menu of the course sits close to the header above it and to the sections below.
     .secondary-navigation {
-        margin-bottom: .5rem;
+        margin-bottom: 0;
+        padding-bottom: 0;
         border: 0;
         background: none;
         box-shadow: none;
+
+        .navigation .nav-item {
+            height: auto;
+            padding: .25rem 0;
+        }
 
         .navigation,
         .nav-tabs {
@@ -6776,7 +6798,9 @@ $rsmax-menu-shadow: 0 1px 2px rgba($rsmax-stage-bg, .08), 0 22px 44px -18px rgba
         }
     }
 
+    // Moodle gives a link already visited a colour of its own, which won over this one.
     .mds-nav-pill--selected,
+    .mds-nav-pill--selected:visited,
     .mds-nav-pill--selected:hover,
     .mds-nav-pill--selected:focus {
         color: $white;

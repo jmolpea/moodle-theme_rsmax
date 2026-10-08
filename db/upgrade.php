@@ -91,5 +91,14 @@ function xmldb_theme_rsmax_upgrade($oldversion) {
         \theme_rsmax\local\assistant::ensure();
         upgrade_plugin_savepoint(true, 2026100727, 'theme', 'rsmax');
     }
+    if ($oldversion < 2026100731) {
+        // The content column is wider by default. Sites still on the old default follow it; a
+        // width somebody chose is left alone.
+        if ((int) get_config('theme_rsmax', 'contentwidth') === 1120) {
+            set_config('contentwidth', 1280, 'theme_rsmax');
+        }
+        theme_reset_all_caches();
+        upgrade_plugin_savepoint(true, 2026100731, 'theme', 'rsmax');
+    }
     return true;
 }

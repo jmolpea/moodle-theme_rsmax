@@ -37,8 +37,6 @@ class course_header {
      * @return array name, image, category and teachers (a list of names).
      */
     public static function export(stdClass $course): array {
-        global $OUTPUT;
-
         $context = \core\context\course::instance($course->id);
         $category = \core_course_category::get($course->category, IGNORE_MISSING);
         $teachers = [];
@@ -47,7 +45,8 @@ class course_header {
         }
         return [
             'name' => format_string($course->fullname, true, ['context' => $context]),
-            'image' => course_summary_exporter::get_course_image($course) ?: $OUTPUT->get_generated_image_for_id($course->id),
+            // Without a picture the header keeps the background of the theme.
+            'image' => course_summary_exporter::get_course_image($course) ?: '',
             'category' => $category ? $category->get_formatted_name() : '',
             'teachers' => implode(', ', array_slice($teachers, 0, self::MAXTEACHERS)),
         ];

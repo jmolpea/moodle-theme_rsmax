@@ -182,7 +182,7 @@ function theme_rsmax_get_pre_scss($theme) {
     if (in_array($weight, [500, 600, 700, 800])) {
         $scss .= '$headings-font-weight: ' . $weight . ";\n";
     }
-    $contentwidth = (int) ($settings->contentwidth ?? 1120);
+    $contentwidth = (int) ($settings->contentwidth ?? 1280);
     if (in_array($contentwidth, THEME_RSMAX_CONTENT_WIDTHS)) {
         $scss .= '$course-content-maxwidth: ' . $contentwidth . "px;\n";
     }

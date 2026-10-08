@@ -88,7 +88,7 @@ if ($ADMIN->fulltree) {
         'theme_rsmax/contentwidth',
         $name('contentwidth'),
         $desc('contentwidth'),
-        1120,
+        1280,
         $widths
     ));
     $add($page, $select('roundness', array_keys(THEME_RSMAX_ROUNDNESS), 'soft'));
