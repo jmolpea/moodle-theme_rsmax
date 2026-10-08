@@ -1,5 +1,10 @@
 # Changes
 
+## 1.0.2 (2026-10-08)
+
+- The buttons that open the side panels touch the content they open; on the home page they hang from the edges of the window.
+- The open page of the course menu keeps its colour when the link has been visited.
+
 ## 1.0.1 (2026-10-08)
 
 - The course page is wider (1280 px by default) and tighter: the course header starts right under the navigation bar and the course menu sits close to it and to the sections.

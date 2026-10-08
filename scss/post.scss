@@ -336,6 +336,72 @@ body.pagelayout-mycourses {
     border-radius: 0 $border-radius-lg $border-radius-lg 0;
 }
 
+// Where the tabs hang. Boost anchors them to the content column but leaves the room of an open
+// panel's padding in between, and the tab has its own margin on top of that: together, a gap of
+// 56px. Here the tab touches what it opens next to. $inset is how far inside the column the
+// content starts, on the pages where the column itself has no frame.
+@mixin rsmax-drawer-tabs($inset: 0px) {
+    $gap: calc(#{$drawer-main-gap} + 28px + #{$inset});
+    // On a window too narrow for the column, the tab stays at the edge of the content.
+    $edge: calc(100% - 3rem - 28px - #{$inset});
+
+    .drawer-toggles .drawer-left-toggle {
+        right: Min(calc(#{$drawer-anchor-none} - #{$gap}), #{$edge});
+    }
+
+    .drawer-toggles .drawer-right-toggle {
+        left: Min(calc(#{$drawer-anchor-none} - #{$gap}), #{$edge});
+    }
+
+    &:has(#page.drawers.show-drawer-right):not(:has(#page.drawers.show-drawer-left)) .drawer-toggles .drawer-left-toggle {
+        right: Min(calc(#{$drawer-anchor-right-open} - #{$gap}), #{$edge});
+    }
+
+    &:has(#page.drawers.show-drawer-left):not(:has(#page.drawers.show-drawer-right)) .drawer-toggles .drawer-right-toggle {
+        left: Min(calc(#{$drawer-right-anchor-left-open} - #{$gap}), #{$edge});
+    }
+}
+
+@include media-breakpoint-up(lg) {
+    .pagelayout-standard,
+    body.limitedwidth {
+        @include rsmax-drawer-tabs;
+    }
+
+    // A course page has no frame around its column, and neither has an activity that opens
+    // with its stage: the tabs touch that header, which starts after the padding Boost gives
+    // the column (.5rem) and its content (15px).
+    body.limitedwidth.pagelayout-course,
+    body.limitedwidth.rsmax-hasstage {
+        @include rsmax-drawer-tabs(calc(.5rem + 15px));
+    }
+
+    // The home page is as wide as the window, so its tabs hang from the edges of the window.
+    body.pagelayout-frontpage.pagelayout-frontpage {
+        .drawer-toggles .drawer-left-toggle,
+        &:has(#page.drawers.show-drawer-right) .drawer-toggles .drawer-left-toggle {
+            right: auto;
+            left: 0;
+        }
+
+        .drawer-toggles .drawer-right-toggle,
+        &:has(#page.drawers.show-drawer-left) .drawer-toggles .drawer-right-toggle {
+            right: 0;
+            left: auto;
+        }
+
+        .drawer-toggles .drawer-left-toggle .btn {
+            margin: 0;
+            border-radius: 0 $border-radius-lg $border-radius-lg 0;
+        }
+
+        .drawer-toggles .drawer-right-toggle .btn {
+            margin: 0;
+            border-radius: $border-radius-lg 0 0 $border-radius-lg;
+        }
+    }
+}
+
 @include media-breakpoint-down(md) {
     // On small screens Boost floats the buttons over the page: there they are round.
     .drawer-toggles .drawer-toggler .btn {
@@ -6798,13 +6864,16 @@ $rsmax-menu-shadow: 0 1px 2px rgba($rsmax-stage-bg, .08), 0 22px 44px -18px rgba
         }
     }
 
-    // Moodle gives a link already visited a colour of its own, which won over this one.
+    // Moodle paints the open page with a variable, and a visited link from a longer selector
+    // than a plain rule can beat: the variable is set, and the visited link is named the same way.
+    --mds-bg-nav-pill-selected: #{$rsmax-stage-bg};
+
     .mds-nav-pill--selected,
-    .mds-nav-pill--selected:visited,
     .mds-nav-pill--selected:hover,
-    .mds-nav-pill--selected:focus {
+    .mds-nav-pill--selected:focus,
+    .navigation.secondarynav-tabbar .mds-nav-pill--selected:visited {
         color: $white;
-        background: $rsmax-stage-bg;
+        background-color: $rsmax-stage-bg;
         font-weight: 600;
     }
 
@@ -6969,9 +7038,14 @@ $rsmax-menu-shadow: 0 1px 2px rgba($rsmax-stage-bg, .08), 0 22px 44px -18px rgba
         }
     }
 
-    .secondary-navigation .mds-nav-pill--selected {
+    .secondary-navigation {
+        --mds-bg-nav-pill-selected: #{$white};
+    }
+
+    .secondary-navigation .mds-nav-pill--selected,
+    .secondary-navigation .navigation.secondarynav-tabbar .mds-nav-pill--selected:visited {
         color: $rsmax-stage-bg;
-        background: $white;
+        background-color: $white;
     }
 
     .drawer.drawer-primary .list-group-item.active {
