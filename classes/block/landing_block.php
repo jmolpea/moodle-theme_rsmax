@@ -214,7 +214,10 @@ abstract class landing_block extends \block_base {
         if ($value === '') {
             return '';
         }
-        return format_text($value, FORMAT_PLAIN, ['context' => $this->context, 'para' => false]);
+        // Line by line, because format_text() does not run the filters on plain text: a multilang
+        // text would be printed with its tags.
+        $lines = array_map(fn($line) => $this->format_plain($line), preg_split('/\R/u', $value));
+        return implode('<br>', $lines);
     }
 
     /**

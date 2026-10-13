@@ -178,6 +178,14 @@ $rsmax-button-colour: if($rsmax-button-text == dark, $rsmax-ink, $rsmax-button-a
     background: $rsmax-ink !important; /* stylelint-disable-line declaration-no-important */
 }
 
+// A logo made for a light page disappears on these menus: it is drawn as a white shape.
+@if $rsmax-logo-white {
+    .navbar.rsmax-navbar-dark .navbar-brand .logo,
+    .navbar.rsmax-navbar-brand .navbar-brand .logo {
+        filter: brightness(0) invert(1);
+    }
+}
+
 .rsmax-navbar-brand {
     background: $primary !important; /* stylelint-disable-line declaration-no-important */
 }
@@ -398,6 +406,18 @@ body.pagelayout-mycourses {
         .drawer-toggles .drawer-right-toggle .btn {
             margin: 0;
             border-radius: $border-radius-lg 0 0 $border-radius-lg;
+        }
+
+        // Boost floats the panels of a page with a narrow column as cards. The home page has no
+        // column: next to its bands a floating card leaves a hole above it and another below.
+        // Here the panels are docked to the window, from the menu down; theme_rsmax/drawers
+        // still shortens them when the footer comes into view.
+        .drawer.drawer-left,
+        .drawer.drawer-right {
+            top: $navbar-height;
+            height: calc(100vh - #{$navbar-height});
+            max-height: none;
+            border-radius: 0;
         }
     }
 }
@@ -1831,6 +1851,19 @@ body.rsmax-hasstage {
         border: 0;
         background: transparent;
         box-shadow: none;
+    }
+
+    // The header of an activity or of a section starts where the header of the course does, and is
+    // as wide: going from one page to the next, it does not move. Moodle pads the page of a
+    // section from a selector with two ids, so it is named the same way.
+    @include media-breakpoint-up(lg) {
+        #page.drawers .main-inner,
+        #page.drawers #topofscroll {
+            margin-top: .5rem;
+            padding-top: 0;
+            padding-right: .5rem;
+            padding-left: .5rem;
+        }
     }
 
     #region-main {
@@ -5332,15 +5365,38 @@ body.hasstickyfooter:has(.rsmax-dock) {
         }
     }
 
+    // The button of the page shares the bar with the way on. On a narrow phone its label takes two
+    // short lines: one line was cut short, or ran under the button that goes on.
     .stickyfooter .rsmax-dock .course-linear-navigation-completion {
+        flex: 0 1 auto;
         min-width: 0;
 
-        .btn {
-            overflow: hidden;
+        .btn,
+        .completion-status {
             max-width: 100%;
             font-size: .75rem;
-            text-overflow: ellipsis;
+            line-height: 1.15;
+            text-wrap: balance;
+            white-space: normal !important; /* stylelint-disable-line declaration-no-important */
         }
+
+        .activity-completion-status {
+            display: block;
+            min-width: 0;
+        }
+    }
+
+    // Beside that button the label of the way on gives up room too.
+    .rsmax-dock:has(.course-linear-navigation-completion) .rsmax-dock-next .rsmax-dock-kicker {
+        max-width: 4.75rem;
+        line-height: 1.25;
+        white-space: normal;
+    }
+
+    .stickyfooter .rsmax-dock .course-linear-navigation-completion .completion-status {
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
     }
 
     .rsmax-dock-kicker {
@@ -5379,6 +5435,25 @@ body.hasstickyfooter:has(.rsmax-dock) {
 
     .rsmax-banners-row {
         grid-template-columns: 5rem minmax(0, 1fr) auto;
+    }
+}
+
+// The narrowest phones: a page that is done says so with its tick alone.
+@media (max-width: 359.98px) {
+    .stickyfooter .rsmax-dock .course-linear-navigation-completion {
+        .btn-subtle-success,
+        .btn-success,
+        .completion-status {
+            gap: 0;
+            min-width: 2.25rem;
+            padding-right: .6rem;
+            padding-left: .6rem;
+            font-size: 0;
+
+            .fa {
+                font-size: .875rem;
+            }
+        }
     }
 }
 
@@ -6968,10 +7043,16 @@ $rsmax-menu-shadow: 0 1px 2px rgba($rsmax-stage-bg, .08), 0 22px 44px -18px rgba
     // than a plain rule can beat: the variable is set, and the visited link is named the same way.
     --mds-bg-nav-pill-selected: #{$rsmax-stage-bg};
 
+    // The server marks the open page with "active" (the tabs of the administration), the browser
+    // with "mds-nav-pill--selected": both are the same pill.
     .mds-nav-pill--selected,
     .mds-nav-pill--selected:hover,
     .mds-nav-pill--selected:focus,
-    .navigation.secondarynav-tabbar .mds-nav-pill--selected:visited {
+    .navigation.secondarynav-tabbar .mds-nav-pill--selected:visited,
+    .navigation.secondarynav-tabbar .mds-nav-pill.active,
+    .navigation.secondarynav-tabbar .mds-nav-pill.active:hover,
+    .navigation.secondarynav-tabbar .mds-nav-pill.active:focus,
+    .navigation.secondarynav-tabbar .mds-nav-pill.active:visited {
         color: $white;
         background-color: $rsmax-stage-bg;
         font-weight: 600;
@@ -7116,8 +7197,11 @@ $rsmax-menu-shadow: 0 1px 2px rgba($rsmax-stage-bg, .08), 0 22px 44px -18px rgba
             background: var(--rsmax-key) !important; /* stylelint-disable-line declaration-no-important */
         }
 
-        &.active {
-            color: $white;
+        // Its own dark fill, whatever the brand colour: the text is always white.
+        &.active,
+        &.active:hover,
+        &.active:focus {
+            color: $white !important; /* stylelint-disable-line declaration-no-important */
             background: $rsmax-stage-bg !important; /* stylelint-disable-line declaration-no-important */
         }
 
@@ -7143,13 +7227,17 @@ $rsmax-menu-shadow: 0 1px 2px rgba($rsmax-stage-bg, .08), 0 22px 44px -18px rgba
     }
 
     .secondary-navigation .mds-nav-pill--selected,
-    .secondary-navigation .navigation.secondarynav-tabbar .mds-nav-pill--selected:visited {
+    .secondary-navigation .navigation.secondarynav-tabbar .mds-nav-pill--selected:visited,
+    .secondary-navigation .navigation.secondarynav-tabbar .mds-nav-pill.active,
+    .secondary-navigation .navigation.secondarynav-tabbar .mds-nav-pill.active:hover,
+    .secondary-navigation .navigation.secondarynav-tabbar .mds-nav-pill.active:focus,
+    .secondary-navigation .navigation.secondarynav-tabbar .mds-nav-pill.active:visited {
         color: $rsmax-stage-bg;
         background-color: $white;
     }
 
     .drawer.drawer-primary .list-group-item.active {
-        color: $rsmax-stage-bg;
+        color: $rsmax-stage-bg !important; /* stylelint-disable-line declaration-no-important */
         background: $white !important; /* stylelint-disable-line declaration-no-important */
     }
 }

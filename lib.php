@@ -101,15 +101,62 @@ const THEME_RSMAX_INDEX_WIDTHS = [285, 320, 360];
 const THEME_RSMAX_OLD_COLOURS = ['inkcolor' => '#0a0a0a', 'surfacecolor' => '#f5f5f5', 'bandcolor2' => '#f3f6f9'];
 
 /**
- * Ready-made palettes: the four colours the whole site is drawn from (brand, accent, dark and
- * background). Choosing one in the settings writes them; "custom" leaves the colours as they are.
+ * Ready-made palettes. Each one writes the four colours the whole site is drawn from (brand,
+ * accent, dark and background) and the settings that give the site its character: the colour of
+ * the course and activity headers, of the home hero and of the course index, and the style of the
+ * menu and of the footer. What a palette does not name goes back to its default, so nothing of the
+ * palette before it is left behind. "custom" leaves everything as it is.
+ *
+ * The headers carry white text: their colour must be deep enough for it (4.5:1 or more).
  */
 const THEME_RSMAX_PALETTES = [
-    'warm' => ['brandcolor' => '#00a8d6', 'accentcolor' => '#2dd4bf', 'inkcolor' => '#2b2624', 'surfacecolor' => '#f6f1ea'],
-    'slate' => ['brandcolor' => '#2563eb', 'accentcolor' => '#38bdf8', 'inkcolor' => '#1e293b', 'surfacecolor' => '#f1f5f9'],
-    'forest' => ['brandcolor' => '#2f7d5b', 'accentcolor' => '#e0b34a', 'inkcolor' => '#1f2a24', 'surfacecolor' => '#f3f1e7'],
-    'navy' => ['brandcolor' => '#c2410c', 'accentcolor' => '#f5b94a', 'inkcolor' => '#172554', 'surfacecolor' => '#f5f3ee'],
-    'plum' => ['brandcolor' => '#9d3f8f', 'accentcolor' => '#f0a6ca', 'inkcolor' => '#2a1f2d', 'surfacecolor' => '#f7f1f4'],
+    'warm' => [
+        'brandcolor' => '#00a8d6', 'accentcolor' => '#2dd4bf', 'inkcolor' => '#2b2624', 'surfacecolor' => '#f6f1ea',
+    ],
+    'slate' => [
+        'brandcolor' => '#2563eb', 'accentcolor' => '#38bdf8', 'inkcolor' => '#1e293b', 'surfacecolor' => '#f1f5f9',
+        'stagecolor' => '#1e3a8a', 'herocolor' => '#172554', 'indexcolor' => '#1e293b', 'footerbgcolor' => '#0f172a',
+    ],
+    'forest' => [
+        'brandcolor' => '#2f7d5b', 'accentcolor' => '#e0b34a', 'inkcolor' => '#1f2a24', 'surfacecolor' => '#f3f1e7',
+        'stagecolor' => '#235741', 'herocolor' => '#1b4332', 'heroglowcolor' => '#e0b34a', 'indexcolor' => '#1f2a24',
+        'footerbgcolor' => '#1b4332',
+    ],
+    'ocean' => [
+        'brandcolor' => '#0f766e', 'accentcolor' => '#fb923c', 'inkcolor' => '#134e4a', 'surfacecolor' => '#f0f7f6',
+        'stagecolor' => '#115e59', 'herocolor' => '#134e4a', 'heroglowcolor' => '#fb923c', 'indexcolor' => '#134e4a',
+        'navbarstyle' => 'brand',
+    ],
+    'navy' => [
+        'brandcolor' => '#c2410c', 'accentcolor' => '#f5b94a', 'inkcolor' => '#172554', 'surfacecolor' => '#f5f3ee',
+        'stagecolor' => '#1e3a8a', 'herocolor' => '#172554', 'heroglowcolor' => '#c2410c', 'indexcolor' => '#172554',
+        'navbarstyle' => 'dark',
+    ],
+    'plum' => [
+        'brandcolor' => '#9d3f8f', 'accentcolor' => '#f0a6ca', 'inkcolor' => '#2a1f2d', 'surfacecolor' => '#f7f1f4',
+        'stagecolor' => '#5a2a5c', 'herocolor' => '#3d1f42', 'heroglowcolor' => '#f0a6ca', 'indexcolor' => '#2a1f2d',
+        'footerstyle' => 'brand',
+    ],
+    'sand' => [
+        'brandcolor' => '#b4532a', 'accentcolor' => '#84a98c', 'inkcolor' => '#3b2f2a', 'surfacecolor' => '#faf6f0',
+        'stagecolor' => '#8a4b2a', 'herocolor' => '#6f3d24', 'heroglowcolor' => '#e9c46a', 'indexcolor' => '#3b2f2a',
+        'footerstyle' => 'light',
+    ],
+    'graphite' => [
+        'brandcolor' => '#18181b', 'accentcolor' => '#f59e0b', 'inkcolor' => '#18181b', 'surfacecolor' => '#f4f4f5',
+        'linkcolor' => '#b45309', 'buttoncolor' => '#f59e0b', 'stagecolor' => '#27272a', 'heroglowcolor' => '#f59e0b',
+        'footerstyle' => 'light',
+    ],
+];
+
+/**
+ * What a palette may write, with the value each setting takes when the palette does not name it.
+ * The second band of the landing pages is not here: it follows the background of the palette.
+ */
+const THEME_RSMAX_PALETTE_DEFAULTS = [
+    'linkcolor' => '', 'buttoncolor' => '', 'stagecolor' => '', 'papercolor' => '', 'indexcolor' => '',
+    'herocolor' => '', 'heroglowcolor' => '', 'footerbgcolor' => '', 'footertextcolor' => '',
+    'bandcolor1' => '#ffffff', 'cardcolor' => '#ffffff', 'navbarstyle' => 'light', 'footerstyle' => 'dark',
 ];
 
 /** Columns of links in the footer. */
@@ -160,6 +207,9 @@ function theme_rsmax_get_pre_scss($theme) {
     if (in_array($settings->buttontext ?? '', ['light', 'dark', 'auto'])) {
         // Auto is also the default of the theme: whichever of the two reads on the button.
         $scss .= '$rsmax-button-text: ' . $settings->buttontext . ";\n";
+    }
+    if (isset($settings->logowhite) && empty($settings->logowhite)) {
+        $scss .= "\$rsmax-logo-white: false;\n";
     }
     if (isset($settings->shadows) && empty($settings->shadows)) {
         $scss .= "\$rsmax-shadows: false;\n";
@@ -320,24 +370,31 @@ function theme_rsmax_apply_default_course_blocks(): void {
 }
 
 /**
- * Writes the colours of the palette chosen in the settings. Called when the palette changes.
+ * Called when the palette changes in the theme settings.
  *
- * The colours of a palette replace the four main ones and clear those that only exist to set a
- * part of the site apart from them, so the whole site follows. "Custom" changes nothing.
+ * The form that carries the palette carries every colour too, and Moodle writes them one by one
+ * after this is called: applied now, the palette would be overwritten by the colours the form
+ * still shows. It is applied when the request ends, once the whole form has been saved.
+ */
+function theme_rsmax_palette_chosen(): void {
+    \core_shutdown_manager::register_function('theme_rsmax_apply_palette');
+}
+
+/**
+ * Writes the settings of the palette chosen in the theme settings.
+ *
+ * A palette replaces the four main colours, the colours and styles it names, and puts back to its
+ * default whatever it does not name, so the whole site follows. "Custom" changes nothing.
  */
 function theme_rsmax_apply_palette(): void {
     $palette = get_config('theme_rsmax', 'palette');
     if (!isset(THEME_RSMAX_PALETTES[$palette])) {
         return;
     }
-    foreach (THEME_RSMAX_PALETTES[$palette] as $setting => $colour) {
-        set_config($setting, $colour, 'theme_rsmax');
+    $values = THEME_RSMAX_PALETTES[$palette];
+    $values += ['bandcolor2' => $values['surfacecolor']] + THEME_RSMAX_PALETTE_DEFAULTS;
+    foreach ($values as $setting => $value) {
+        set_config($setting, $value, 'theme_rsmax');
     }
-    $derived = ['linkcolor', 'buttoncolor', 'stagecolor', 'papercolor', 'indexcolor', 'herocolor', 'heroglowcolor',
-        'footerbgcolor', 'footertextcolor'];
-    foreach ($derived as $setting) {
-        set_config($setting, '', 'theme_rsmax');
-    }
-    set_config('bandcolor2', THEME_RSMAX_PALETTES[$palette]['surfacecolor'], 'theme_rsmax');
     theme_reset_all_caches();
 }

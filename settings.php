@@ -76,7 +76,7 @@ if ($ADMIN->fulltree) {
         $palettes[$palette] = get_string('palette:' . $palette, 'theme_rsmax');
     }
     $setting = new admin_setting_configselect('theme_rsmax/palette', $name('palette'), $desc('palette'), 'custom', $palettes);
-    $setting->set_updatedcallback('theme_rsmax_apply_palette');
+    $setting->set_updatedcallback('theme_rsmax_palette_chosen');
     $page->add($setting);
     $addcolours($page, 'brand');
     $add($page, $select('buttontext', ['auto', 'light', 'dark'], 'auto'));
@@ -136,13 +136,40 @@ if ($ADMIN->fulltree) {
 
     // Header.
     $page = new admin_settingpage('theme_rsmax_header', $name('headersettings'));
+    // The logos and the icon of the site are Moodle's own settings: shown here too, so the whole
+    // look of the site is changed from one place. They are the same settings, not copies.
     $add($page, $heading('logoinfo'));
+    $add($page, new admin_setting_configstoredfile(
+        'core_admin/logo',
+        new lang_string('logo', 'admin'),
+        new lang_string('logo_desc', 'admin'),
+        'logo',
+        0,
+        ['maxfiles' => 1, 'accepted_types' => ['.jpg', '.png']]
+    ));
+    $add($page, new admin_setting_configstoredfile(
+        'core_admin/logocompact',
+        new lang_string('logocompact', 'admin'),
+        new lang_string('logocompact_desc', 'admin'),
+        'logocompact',
+        0,
+        ['maxfiles' => 1, 'accepted_types' => ['.jpg', '.png']]
+    ));
+    $add($page, new admin_setting_configstoredfile(
+        'core_admin/favicon',
+        new lang_string('favicon', 'admin'),
+        new lang_string('favicon_desc', 'admin'),
+        'favicon',
+        0,
+        ['maxfiles' => 1, 'accepted_types' => ['image']]
+    ));
     $add($page, $select('navbarstyle', ['light', 'dark', 'brand'], 'light'));
     $heights = [];
     foreach ([28, 32, 36, 40, 48, 56] as $height) {
         $heights[$height] = $height . ' px';
     }
     $add($page, new admin_setting_configselect('theme_rsmax/logoheight', $name('logoheight'), $desc('logoheight'), 36, $heights));
+    $add($page, $checkbox('logowhite', 1));
     $add($page, $checkbox('navbarsearch', 1));
     $add($page, $text('navbarbuttontext'));
     $add($page, $text('navbarbuttonurl', PARAM_RAW_TRIMMED));

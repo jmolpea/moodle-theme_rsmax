@@ -26,6 +26,8 @@ $rsmax-index-bg: null !default;
 // Boost's is 285px: section names rarely fit in it.
 $drawer-left-width: 320px !default;
 $rsmax-logo-height: 36px !default;
+// On a dark or brand coloured menu the logo is drawn in white, unless the settings say otherwise.
+$rsmax-logo-white: true !default;
 // Width of the content column. Boost places the side drawers and their buttons from this value,
 // so widening it here keeps everything aligned.
 $course-content-maxwidth: 1280px !default;
