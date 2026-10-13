@@ -1,5 +1,9 @@
 # Changes
 
+## 1.2.1 (2026-10-13)
+
+- On a wide window the side panels of the site home reach the edge of the window: the panel stopped short of it and left an empty strip beside it.
+
 ## 1.2.0 (2026-10-13)
 
 - Ready-made palettes change the whole character of the site: besides the four main colours, each one sets the colour of the course and activity headers, of the home hero, of the course index and of the footer, and the style of the menu and of the footer. Three new palettes (Ocean, Sand and Graphite): eight in all.

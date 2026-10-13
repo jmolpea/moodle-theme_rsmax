@@ -419,6 +419,22 @@ body.pagelayout-mycourses {
             max-height: none;
             border-radius: 0;
         }
+
+        // Boost also places them beside a column of the content width, which the home page does
+        // not have: on a wide window the panel stopped short of the edge, and the page, which
+        // makes room for it at the edge, left that room empty. They go against the edges,
+        // whichever panels are open.
+        .drawer.drawer-left,
+        .drawer.drawer-left.show {
+            right: auto !important; /* stylelint-disable-line declaration-no-important */
+            left: 0 !important; /* stylelint-disable-line declaration-no-important */
+        }
+
+        .drawer.drawer-right,
+        .drawer.drawer-right.show {
+            right: 0 !important; /* stylelint-disable-line declaration-no-important */
+            left: auto !important; /* stylelint-disable-line declaration-no-important */
+        }
     }
 }
 
