@@ -2094,12 +2094,13 @@ body.pagelayout-incourse {
     }
 }
 
-// Reading pages (page, book, lesson, wiki): text set for reading, not for filling the column.
+// Reading pages (page, book, lesson, wiki): text set for reading. They take the whole column:
+// held to a reading measure, a page with tables, cards or embedded media was cut to half of it.
 .path-mod-page .rsmax-maincontent .generalbox,
 .path-mod-book .book_content,
 .path-mod-lesson .rsmax-maincontent .contents,
 .path-mod-wiki .wiki_contentbox {
-    max-width: $rsmax-measure;
+    max-width: 100%;
     padding: 0;
     border: 0;
     font-size: 1.0625rem;

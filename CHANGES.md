@@ -1,5 +1,9 @@
 # Changes
 
+## 1.2.2 (2026-10-13)
+
+- The content of pages, books, lessons and wikis takes the whole width of the column, instead of a narrow reading measure that cut pages with tables, cards or video in half.
+
 ## 1.2.1 (2026-10-13)
 
 - On a wide window the side panels of the site home reach the edge of the window: the panel stopped short of it and left an empty strip beside it.

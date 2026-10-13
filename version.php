@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'theme_rsmax';
-$plugin->version = 2026101303;
-$plugin->release = '1.2.1';
+$plugin->version = 2026101304;
+$plugin->release = '1.2.2';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->requires = 2026100200;
 $plugin->supported = [503, 503];
