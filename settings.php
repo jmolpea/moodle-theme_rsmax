@@ -93,6 +93,18 @@ if ($ADMIN->fulltree) {
     ));
     $add($page, $select('roundness', array_keys(THEME_RSMAX_ROUNDNESS), 'soft'));
     $add($page, $checkbox('shadows', 1));
+    // Light and dark modes are switched on in Boost, which is where the code that reads the setting lives. Say so
+    // here, with the names Boost gives the tab and the setting, because nobody looks for it in another theme.
+    $colourmodes = get_config('theme_boost', 'enablecolourmodes') ? 'colourmodeson' : 'colourmodesoff';
+    $page->add(new admin_setting_heading(
+        'theme_rsmax/colourmodes',
+        $name('colourmodes'),
+        get_string($colourmodes, 'theme_rsmax', [
+            'url' => (new moodle_url('/admin/settings.php', ['section' => 'themesettingboost']))->out(),
+            'tab' => get_string('experimentalsettings', 'theme_boost'),
+            'setting' => get_string('enablecolourmodes', 'theme_boost'),
+        ])
+    ));
     $settings->add($page);
 
     // Site home and landing blocks.

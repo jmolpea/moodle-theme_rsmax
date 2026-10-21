@@ -1,5 +1,9 @@
 # Changes
 
+## 1.2.3 (2026-10-13)
+
+- The theme settings say where the light and dark colour modes are switched on.
+
 ## 1.2.2 (2026-10-13)
 
 - The content of pages, books, lessons and wikis takes the whole width of the column, instead of a narrow reading measure that cut pages with tables, cards or video in half.
