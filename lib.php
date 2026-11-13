@@ -174,6 +174,9 @@ function theme_rsmax_get_main_scss_content($theme) {
     $scss = file_get_contents(__DIR__ . '/scss/pre.scss');
     $scss .= file_get_contents($CFG->dirroot . '/theme/boost/scss/preset/default.scss');
     $scss .= file_get_contents(__DIR__ . '/scss/post.scss');
+    // The RSMAX classroom: light course pages for the whole site, then the design inside the courses.
+    $scss .= "\n" . file_get_contents(__DIR__ . '/scss/aula-sitio.scss');
+    $scss .= "\n" . file_get_contents(__DIR__ . '/scss/aula.scss');
     return $scss;
 }
 
@@ -330,6 +333,26 @@ function theme_rsmax_pluginfile($course, $cm, $context, $filearea, $args, $force
         $file = get_file_storage()->get_file($context->id, 'theme_rsmax', $filearea, (int) $args[0], '/', $args[2]);
         if ($file && !$file->is_directory()) {
             send_stored_file($file, DAYSECS * 30, 0, false, $options);
+        }
+    }
+    // The presentation of a module: its photo or video and the files of its texts.
+    $presentationareas = array_merge(
+        [\theme_rsmax\local\section_presentation::AREA_MEDIA],
+        array_values(\theme_rsmax\local\section_presentation::AREA_TEXTS)
+    );
+    if ($context->contextlevel == CONTEXT_COURSE && in_array($filearea, $presentationareas) && count($args) >= 2) {
+        require_course_login($course, true, null, false, true);
+        $itemid = (int) array_shift($args);
+        $filename = array_pop($args);
+        if ($filearea == \theme_rsmax\local\section_presentation::AREA_MEDIA) {
+            // The first part of the path of the photo or the video is its time: it only keeps old copies out of caches.
+            $filepath = '/';
+        } else {
+            $filepath = $args ? '/' . implode('/', $args) . '/' : '/';
+        }
+        $file = get_file_storage()->get_file($context->id, 'theme_rsmax', $filearea, $itemid, $filepath, $filename);
+        if ($file && !$file->is_directory()) {
+            send_stored_file($file, DAYSECS, 0, $forcedownload, $options);
         }
     }
     send_file_not_found();

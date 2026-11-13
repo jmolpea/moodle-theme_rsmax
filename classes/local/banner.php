@@ -43,6 +43,12 @@ class banner {
     /** The course banner is shown on every page of the course that has no banner of its own. */
     public const SCOPE_ALL = 1;
 
+    /** The pages of the course open with the dark stage. */
+    public const STYLE_STAGE = 0;
+
+    /** Light pages: light headers, index and bar between pages, and the assistant in the side panel. */
+    public const STYLE_LIGHT = 1;
+
     /**
      * Options of the file pickers the banners are uploaded with.
      *
@@ -56,7 +62,8 @@ class banner {
      * Returns what the theme knows about the banners of a course.
      *
      * @param int $courseid Course id.
-     * @return array scope, course (URL or an empty string) and sections (URLs by section id).
+     * @return array scope, style (one of the STYLE_ constants), course (URL or an empty string) and
+     *     sections (URLs by section id).
      */
     public static function get(int $courseid): array {
         global $DB;
@@ -68,8 +75,10 @@ class banner {
         }
 
         $context = context_course::instance($courseid);
+        $options = $DB->get_record('theme_rsmax_course', ['courseid' => $courseid], 'bannerscope, pagestyle');
         $data = [
-            'scope' => (int) $DB->get_field('theme_rsmax_course', 'bannerscope', ['courseid' => $courseid]),
+            'scope' => $options ? (int) $options->bannerscope : self::SCOPE_HOME,
+            'style' => $options && $options->pagestyle == self::STYLE_LIGHT ? self::STYLE_LIGHT : self::STYLE_STAGE,
             'course' => '',
             'sections' => [],
         ];
@@ -122,18 +131,52 @@ class banner {
      * @param int $scope One of the SCOPE_ constants.
      */
     public static function set_scope(int $courseid, int $scope): void {
+        self::set_option($courseid, 'bannerscope', $scope == self::SCOPE_ALL ? self::SCOPE_ALL : self::SCOPE_HOME);
+    }
+
+    /**
+     * Sets the look of the pages of a course.
+     *
+     * @param int $courseid Course id.
+     * @param int $style One of the STYLE_ constants.
+     */
+    public static function set_style(int $courseid, int $style): void {
+        self::set_option($courseid, 'pagestyle', $style == self::STYLE_LIGHT ? self::STYLE_LIGHT : self::STYLE_STAGE);
+    }
+
+    /**
+     * Whether the pages of a course are light.
+     *
+     * @param int $courseid Course id.
+     * @return bool
+     */
+    public static function is_light(int $courseid): bool {
+        // The RSMAX classroom is light in every course.
+        if (classroom::enabled($courseid)) {
+            return true;
+        }
+        return self::get($courseid)['style'] == self::STYLE_LIGHT;
+    }
+
+    /**
+     * Saves one option of a course, creating its row when it has none yet.
+     *
+     * @param int $courseid Course id.
+     * @param string $field Column of theme_rsmax_course.
+     * @param int $value Value, already checked.
+     */
+    private static function set_option(int $courseid, string $field, int $value): void {
         global $DB;
 
-        $scope = $scope == self::SCOPE_ALL ? self::SCOPE_ALL : self::SCOPE_HOME;
         $record = $DB->get_record('theme_rsmax_course', ['courseid' => $courseid]);
         if ($record) {
-            $record->bannerscope = $scope;
+            $record->$field = $value;
             $record->timemodified = time();
             $DB->update_record('theme_rsmax_course', $record);
         } else {
             $DB->insert_record('theme_rsmax_course', (object) [
                 'courseid' => $courseid,
-                'bannerscope' => $scope,
+                $field => $value,
                 'timemodified' => time(),
             ]);
         }
@@ -158,6 +201,8 @@ class banner {
         global $DB;
 
         $DB->delete_records('theme_rsmax_course', ['courseid' => $event->objectid]);
+        // The presentations of its modules too (their files go with the context).
+        $DB->delete_records('theme_rsmax_section', ['courseid' => $event->objectid]);
         self::purge($event->objectid);
     }
 
@@ -167,7 +212,15 @@ class banner {
      * @param \core\event\course_section_deleted $event
      */
     public static function section_deleted(\core\event\course_section_deleted $event): void {
-        get_file_storage()->delete_area_files($event->contextid, 'theme_rsmax', self::AREA_SECTION, $event->objectid);
+        global $DB;
+
+        $fs = get_file_storage();
+        $fs->delete_area_files($event->contextid, 'theme_rsmax', self::AREA_SECTION, $event->objectid);
+        // The presentation of the module and its files.
+        $DB->delete_records('theme_rsmax_section', ['sectionid' => $event->objectid]);
+        foreach (array_merge([section_presentation::AREA_MEDIA], array_values(section_presentation::AREA_TEXTS)) as $area) {
+            $fs->delete_area_files($event->contextid, 'theme_rsmax', $area, $event->objectid);
+        }
         self::purge($event->courseid);
     }
 }

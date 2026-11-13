@@ -100,5 +100,49 @@ function xmldb_theme_rsmax_upgrade($oldversion) {
         theme_reset_all_caches();
         upgrade_plugin_savepoint(true, 2026100731, 'theme', 'rsmax');
     }
+    if ($oldversion < 2026110400) {
+        // Each course chooses the look of its pages: the dark stage or light pages.
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('theme_rsmax_course');
+        $field = new xmldb_field('pagestyle', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'bannerscope');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_plugin_savepoint(true, 2026110400, 'theme', 'rsmax');
+    }
+    if ($oldversion < 2026110500) {
+        // The presentation of each module: photo or video, text and «About this module».
+        $dbman = $DB->get_manager();
+        $table = new xmldb_table('theme_rsmax_section');
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('sectionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('heading', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('descriptionformat', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('transcript', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('transcriptformat', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('videourl', XMLDB_TYPE_CHAR, '1333', null, null, null, null);
+        $table->add_field('videoplaceholder', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('abouttitle', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('aboutsummary', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+        $table->add_field('about', XMLDB_TYPE_TEXT, null, null, null, null, null);
+        $table->add_field('aboutformat', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
+        $table->add_key('sectionid', XMLDB_KEY_FOREIGN_UNIQUE, ['sectionid'], 'course_sections', ['id']);
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+        theme_reset_all_caches();
+        upgrade_plugin_savepoint(true, 2026110500, 'theme', 'rsmax');
+    }
+    if ($oldversion < 2026111300) {
+        // The classroom changes every page of a course. A site that already had the theme keeps the
+        // look of its courses until its administrator turns the classroom on; a new site has it on.
+        \theme_rsmax\local\classroom::keep_off_on_upgrade((int) $oldversion);
+        upgrade_plugin_savepoint(true, 2026111300, 'theme', 'rsmax');
+    }
     return true;
 }

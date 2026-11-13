@@ -234,6 +234,7 @@ if ($ADMIN->fulltree) {
 
     // Courses.
     $page = new admin_settingpage('theme_rsmax_course', $name('coursesettings'));
+    $add($page, $checkbox('classroom', 1));
     $add($page, $checkbox('courseheader', 1));
     $add($page, $checkbox('courseprogress', 1));
     $add($page, $checkbox('sectionprogress', 1));

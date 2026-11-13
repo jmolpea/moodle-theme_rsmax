@@ -56,6 +56,9 @@ if ($data = $form->get_data()) {
     file_save_draft_area_files($data->banner, $context->id, 'theme_rsmax', $area, $itemid, banner::file_options());
     if (!$section) {
         banner::set_scope($course->id, (int) $data->scope);
+        if (isset($data->pagestyle)) {
+            banner::set_style($course->id, (int) $data->pagestyle);
+        }
     }
     banner::purge($course->id);
     redirect($baseurl, get_string('bannersaved', 'theme_rsmax'), null, \core\output\notification::NOTIFY_SUCCESS);
@@ -64,7 +67,8 @@ if ($data = $form->get_data()) {
 $draftid = file_get_submitted_draft_itemid('banner');
 file_prepare_draft_area($draftid, $context->id, 'theme_rsmax', $area, $itemid, banner::file_options());
 $banners = banner::get($course->id);
-$form->set_data(['id' => $course->id, 'sectionid' => $itemid, 'banner' => $draftid, 'scope' => $banners['scope']]);
+$form->set_data(['id' => $course->id, 'sectionid' => $itemid, 'banner' => $draftid, 'scope' => $banners['scope'],
+    'pagestyle' => $banners['style']]);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('banners', 'theme_rsmax'));

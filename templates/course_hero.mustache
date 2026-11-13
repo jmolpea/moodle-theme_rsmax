@@ -34,6 +34,49 @@
             "next": {"name": "Schedule template", "url": "#"} }
     }
 }}
+{{#isaula}}
+<section class="rsmax-coursehero rsmax-aulahero{{#banneraula}} rsmax-aulahero--banner{{/banneraula}} d-print-none" aria-labelledby="rsmax-aulahero-title"{{#banneraula}} style="--rsmax-banner: url('{{banneraula}}')"{{/banneraula}}>
+    <div class="rsmax-aulahero-head">
+        {{#current}}
+            <p class="rsmax-aulahero-course">{{{name}}}</p>
+            <h1 class="rsmax-aulahero-title" id="rsmax-aulahero-title">{{#hasshort}}{{short}} · {{/hasshort}}{{title}}</h1>
+            {{#isinprogress}}<p class="rsmax-aulahero-sub">{{#completed}}{{#str}} hero:progress, theme_rsmax, { "completed": {{completed}}, "total": {{total}}, "remaining": {{remaining}} } {{/str}}{{/completed}}{{^completed}}{{#str}} hero:notstarted, theme_rsmax, {{total}} {{/str}}{{/completed}}</p>{{/isinprogress}}
+            {{#iscomplete}}<p class="rsmax-aulahero-sub"><i class="fa fa-circle-check" aria-hidden="true"></i> {{#str}} hero:complete, theme_rsmax, {{total}} {{/str}}</p>{{/iscomplete}}
+            {{#islocked}}<p class="rsmax-aulahero-sub"><i class="fa fa-lock" aria-hidden="true"></i> {{#str}} hero:locked, theme_rsmax, { "previous": {{#quote}}{{previous}}{{/quote}}, "total": {{total}} } {{/str}}</p>{{/islocked}}
+        {{/current}}
+        {{^current}}
+            <h1 class="rsmax-aulahero-title" id="rsmax-aulahero-title">{{{name}}}</h1>
+            {{#progress.iscomplete}}<p class="rsmax-aulahero-sub">{{#str}} hero:coursecomplete, theme_rsmax {{/str}}</p>{{/progress.iscomplete}}
+        {{/current}}
+    </div>
+    {{#nextinfo}}
+        <a class="rsmax-aulahero-next" href="{{url}}">
+            <span class="rsmax-aulahero-next-label">{{#inshown}}{{#str}} continuehere, theme_rsmax {{/str}}{{/inshown}}{{^inshown}}{{#str}} hero:nextin, theme_rsmax, {{module}} {{/str}}{{/inshown}}{{#kind}} · {{kind}}{{/kind}}{{#duration}} · {{duration}}{{/duration}}</span>
+            <span class="rsmax-aulahero-next-name">{{name}}</span>
+            <span class="rsmax-aulahero-next-btn">{{#inshown}}{{#str}} hero:continue, theme_rsmax {{/str}}{{/inshown}}{{^inshown}}{{#str}} hero:goto, theme_rsmax, {{module}} {{/str}}{{/inshown}} <i class="fa fa-arrow-right" aria-hidden="true"></i></span>
+        </a>
+    {{/nextinfo}}
+    {{#hasmodules}}
+    <div class="rsmax-aulahero-map">
+        <h2 class="rsmax-aulahero-map-title">{{#str}} hero:maptitle, theme_rsmax {{/str}} <span>{{#str}} hero:modulesdone, theme_rsmax, { "done": {{modulesdone}}, "total": {{modulestotal}} } {{/str}}</span></h2>
+        <ol class="rsmax-aulahero-bars" style="--rsmax-cols: {{columns}}; --rsmax-cols-phone: {{columnsphone}}">
+            {{#modules}}
+            <li class="{{#iscomplete}}is-complete {{/iscomplete}}{{#iscurrent}}is-current {{/iscurrent}}{{#islocked}}is-locked {{/islocked}}{{#isselected}}is-selected{{/isselected}}"{{#isselected}} aria-current="true"{{/isselected}}>
+                {{^islocked}}<a href="{{url}}" title="{{#hasshort}}{{short}} · {{/hasshort}}{{title}}">{{/islocked}}{{#islocked}}<span title="{{#hasshort}}{{short}} · {{/hasshort}}{{title}}">{{/islocked}}
+                    <span class="rsmax-aulahero-num">{{short}}</span>
+                    <span class="rsmax-aulahero-state" aria-hidden="true">{{#iscomplete}}<i class="fa fa-check"></i>{{/iscomplete}}{{#islocked}}<i class="fa fa-lock"></i>{{/islocked}}{{^iscomplete}}{{^islocked}}{{completed}}/{{total}}{{/islocked}}{{/iscomplete}}</span>
+                    <span class="rsmax-aulahero-bar" style="--p: {{percentage}}%"></span>
+                    <span class="visually-hidden">{{title}}: {{#iscomplete}}{{#str}} hero:a11ycomplete, theme_rsmax {{/str}}{{/iscomplete}}{{#islocked}}{{#str}} hero:a11ylocked, theme_rsmax {{/str}}{{/islocked}}{{^iscomplete}}{{^islocked}}{{#str}} hero:a11ysteps, theme_rsmax, { "completed": {{completed}}, "total": {{total}} } {{/str}}{{/islocked}}{{/iscomplete}}{{#isselected}}, {{#str}} hero:a11yselected, theme_rsmax {{/str}}{{/isselected}}</span>
+                {{#islocked}}</span>{{/islocked}}{{^islocked}}</a>{{/islocked}}
+            </li>
+            {{/modules}}
+        </ol>
+        <p class="rsmax-aulahero-legend" aria-hidden="true"><span class="is-complete">{{#str}} hero:legendcomplete, theme_rsmax {{/str}}</span><span class="is-current">{{#str}} hero:legendcurrent, theme_rsmax {{/str}}</span><span class="is-todo">{{#str}} hero:legendtodo, theme_rsmax {{/str}}</span><span class="is-locked">{{#str}} hero:legendlocked, theme_rsmax {{/str}}</span></p>
+    </div>
+    {{/hasmodules}}
+</section>
+{{/isaula}}
+{{^isaula}}
 <section class="rsmax-coursehero d-print-none"{{#image}} style="--rsmax-banner: url('{{image}}')"{{/image}}>
     <div class="rsmax-coursehero-inner">
         <div class="rsmax-coursehero-text">
@@ -47,12 +90,15 @@
             <div class="rsmax-coursehero-progress{{#iscomplete}} is-complete{{/iscomplete}}">
                 <div class="rsmax-ring" style="--rsmax-ring: {{percentage}}" role="progressbar" aria-valuenow="{{percentage}}"
                      aria-valuemin="0" aria-valuemax="100" aria-label="{{#str}} yourprogress, theme_rsmax {{/str}}">
-                    <span class="rsmax-ring-figure">{{percentage}}<small>%</small></span>
+                    <span class="rsmax-ring-figure">{{#isaula}}{{#underone}}&lt;1{{/underone}}{{^underone}}{{percentage}}{{/underone}}{{/isaula}}{{^isaula}}{{percentage}}{{/isaula}}<small>%</small></span>
                 </div>
                 <div class="rsmax-coursehero-count">
                     <span class="rsmax-coursehero-label">{{#str}} yourprogress, theme_rsmax {{/str}}</span>
                     {{#iscomplete}}{{#str}} progresscomplete, theme_rsmax {{/str}}{{/iscomplete}}
-                    {{^iscomplete}}{{#str}} progresscount, theme_rsmax, { "completed": {{completed}}, "total": {{total}} } {{/str}}{{/iscomplete}}
+                    {{^iscomplete}}
+                        {{#isaula}}{{completed}} de {{total}} actividades con seguimiento contabilizadas{{/isaula}}
+                        {{^isaula}}{{#str}} progresscount, theme_rsmax, { "completed": {{completed}}, "total": {{total}} } {{/str}}{{/isaula}}
+                    {{/iscomplete}}
                 </div>
             </div>
         {{/progress}}
@@ -65,3 +111,4 @@
         </a>
     {{/next}}{{/progress}}
 </section>
+{{/isaula}}

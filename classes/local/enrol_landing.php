@@ -222,7 +222,9 @@ class enrol_landing {
             foreach ($modinfo->sections[$section->section] ?? [] as $cmid) {
                 $cm = $modinfo->get_cm($cmid);
                 // Text and media areas are not activities, and stealth or hidden ones are not announced.
-                if (!$cm->visible || !$cm->is_visible_on_course_page() || !$cm->has_view() || $cm->deletioninprogress) {
+                // Access restrictions do not count: somebody outside the course meets none of them, and a course
+                // that opens its sections one after another would look almost empty (25 activities instead of 250).
+                if (!$cm->visible || empty($cm->visibleoncoursepage) || !$cm->has_view() || $cm->deletioninprogress) {
                     continue;
                 }
                 $activities[] = [

@@ -1,0 +1,333 @@
+// The RSMAX classroom, outside the content of a course: the pieces of the site that every page
+// of a course shares (tables in content, the quiz attempt, the side panel buttons).
+//
+// The same three stylelint rules are off here as in aula.scss, for the same reasons.
+/* stylelint-disable csstree/validator, declaration-no-important, max-line-length */
+/* =====================================================================
+   Aula RSMAX · capa de sitio
+   Se aplica en todas las páginas del sitio, también en el intento de
+   cuestionario.
+   ===================================================================== */
+
+/* 1 · Fondo de las aulas claras (el degradado de la v5). */
+body.rsmax-light {
+    background: linear-gradient(120deg, #d9f8ef 0%, #eef6f8 43%, #e9e6fa 100%) fixed !important;
+}
+body.rsmax-light #page-wrapper,
+body.rsmax-light #page {
+    background: transparent !important;
+}
+
+/* 2 · Botones de los cajones: con el cajón cerrado, viven en su propio
+   margen y no se montan sobre el título ni sobre el contenido. La portada
+   no reserva ese margen: sus bloques van a ancho completo. */
+@media (min-width: 768px) {
+    body:not(.pagelayout-frontpage):has(.drawer-left-toggle) #page.drawers:not(.show-drawer-left) {
+        padding-left: 6.5rem;
+    }
+    body:not(.pagelayout-frontpage):has(.drawer-right-toggle) #page.drawers:not(.show-drawer-right) {
+        padding-right: 6.5rem;
+    }
+    .drawer-toggles .drawer-toggler .btn {
+        background: #fff;
+        border: 1px solid #e1e7e5;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px -10px rgba(31, 42, 40, .35);
+    }
+    .drawer-toggles .drawer-toggler .btn:hover,
+    .drawer-toggles .drawer-toggler .btn:focus-visible {
+        background: #e6f5f1;
+        border-color: #0d8a7c;
+    }
+}
+
+/* 3 · Tablas dentro de los contenidos (páginas, descripciones, libros,
+   etiquetas, glosario, foros). No toca las tablas propias de Moodle. */
+:is(.no-overflow, .text_to_html, .rsx, .box.generalbox, .activity-description, .summarytext, .posting, .entry, .book_content)
+table:not(.generaltable):not(.flexible):not(.admintable):not(.calendartable):not(.minicalendar):not(.quizreviewsummary):not(.table-reboot) {
+    width: 100%;
+    margin: 1.25rem 0 1.75rem;
+    border: 1px solid #dfe7e4 !important;
+    border-radius: 12px !important;
+    border-collapse: separate !important;
+    border-spacing: 0;
+    overflow: hidden;
+    background: #fff !important;
+    font-size: .95rem;
+    line-height: 1.5;
+}
+:is(.no-overflow, .text_to_html, .rsx, .box.generalbox, .activity-description, .summarytext, .posting, .entry, .book_content)
+table:not(.generaltable):not(.flexible):not(.admintable):not(.calendartable):not(.minicalendar):not(.quizreviewsummary):not(.table-reboot) {
+    & > :is(thead, tbody, tfoot) > tr > th,
+    & > tr > th {
+        padding: .75rem 1rem !important;
+        border: 0 !important;
+        border-bottom: 1px solid #d3e3de !important;
+        background: #eef6f3 !important;
+        color: #1f4a45 !important;
+        font-size: .8rem !important;
+        font-weight: 700 !important;
+        font-family: inherit !important;
+        line-height: 1.35 !important;
+        letter-spacing: .01em !important;
+        text-transform: none !important;
+        text-align: left;
+        vertical-align: bottom;
+    }
+    & > :is(thead, tbody, tfoot) > tr > td,
+    & > tr > td {
+        padding: .75rem 1rem !important;
+        border: 0 !important;
+        border-top: 1px solid #edf1ef !important;
+        color: #33403d;
+        vertical-align: top;
+        background: transparent !important;
+    }
+    & > tbody > tr:first-child > td {
+        border-top: 0 !important;
+    }
+    & > tbody > tr:nth-child(even) > td {
+        background: #f9fbfa !important;
+    }
+    & > tbody > tr:hover > td {
+        background: #f0f8f5 !important;
+    }
+    & > tbody > tr > td:first-child {
+        color: #1f2a28;
+        font-weight: 600;
+    }
+    caption {
+        caption-side: top;
+        padding: 0 0 .5rem;
+        color: #5f6c69;
+        font-size: .85rem;
+        font-weight: 600;
+    }
+}
+
+@media (max-width: 767px) {
+    :is(.no-overflow, .text_to_html, .rsx, .box.generalbox, .activity-description, .summarytext, .posting, .entry, .book_content)
+    table:not(.generaltable):not(.flexible):not(.admintable):not(.calendartable):not(.minicalendar):not(.quizreviewsummary):not(.table-reboot) {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* 4 · Botones secundarios: blancos con borde, no grises de Bootstrap. */
+.btn-secondary,
+.btn.btn-secondary {
+    border: 1px solid #cfdcd9;
+    background: #fff;
+    color: #1f2a28;
+    font-weight: 600;
+    &:hover,
+    &:focus-visible {
+        border-color: #0d8a7c;
+        background: #e6f5f1;
+        color: #123e3a;
+    }
+    &:active,
+    &.active {
+        background: #d3efe7;
+        color: #123e3a;
+    }
+    &:disabled,
+    &.disabled {
+        border-color: #e3e8e6;
+        background: #f4f6f5;
+        color: #8b9692;
+    }
+}
+
+/* 5 · Cuestionario: navegación de preguntas y tarjetas con el mismo lenguaje. */
+.path-mod-quiz #mod_quiz_navblock .qnbutton {
+    border-radius: 8px;
+    border-color: #cfdcd9;
+    background: #fff;
+    .thispageholder {
+        border-radius: 8px;
+    }
+    &.thispage {
+        border-color: #0d8a7c;
+        box-shadow: 0 0 0 1px #0d8a7c;
+    }
+    &.answersaved,
+    &.complete {
+        background: #e6f5f1;
+    }
+}
+.path-mod-quiz #mod_quiz_navblock .endtestlink {
+    color: #0d6b60;
+    font-weight: 650;
+}
+
+/* 6 · El texto ocupa todo el ancho de su tarjeta: sin medida de lectura
+   que deje las líneas a dos tercios en glosario, consignas y foros. */
+#region-main :is(p, ul, ol, dl, dd, blockquote, .glossarypost, .rsx-check, .rsx-essentials, .rsx-howto) {
+    max-width: none !important;
+}
+#region-main .glossarypost {
+    width: 100%;
+}
+
+/* 7 · Anterior / siguiente: el nombre completo, en dos líneas si hace falta. */
+.rsmax-dock-name {
+    overflow: visible !important;
+    white-space: normal !important;
+    text-overflow: clip !important;
+    -webkit-line-clamp: unset !important;
+    display: block !important;
+    line-height: 1.3;
+}
+
+/* 8 · En las aulas claras, un solo control flotante: el asistente. */
+body.rsmax-light .btn-footer-popover {
+    display: none !important;
+}
+
+/* v15 · Margen interior de la columna para los botones de los cajones.
+   En pantallas anchas la columna (1280 px) se centra y los botones cuelgan
+   de su borde: quedaban dentro del encabezado y del contenido. Con este
+   margen el contenido se estrecha un poco y los botones quedan fuera.
+   Por debajo de 1400 px ya lo resuelve el relleno de #page (regla 2). */
+@media (min-width: 1400px) {
+    body.rsmax-light.limitedwidth:not(.pagelayout-frontpage) #page.drawers :is(.main-inner, #topofscroll) {
+        padding-left: 2.75rem;
+        padding-right: 2.75rem;
+    }
+}
+
+/* v15b · «Sus intentos» en la portada del cuestionario: Moodle pone los intentos
+   en dos columnas y con uno solo la tarjeta ocupaba media pantalla. Cada intento
+   ocupa ahora el ancho completo y sus datos se reparten en una fila. */
+body#page-mod-quiz-view.rsmax-light ul.row:has(.quizreviewsummary) > li {
+    flex: 0 0 100%;
+    width: 100%;
+    max-width: 100%;
+    padding-right: 0 !important;
+}
+
+@media (min-width: 768px) {
+    body#page-mod-quiz-view.rsmax-light ul.row:has(.quizreviewsummary) table.quizreviewsummary tbody {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* v16 · Áreas dentro de un módulo (theme_rsmax\local\course_areas).
+   Un área es un «Área de texto y medios» marcada como área. En el modo de edición se ve como una
+   franja y se arrastra con sus actividades; fuera de él el tema la cambia por un encabezado plegable. */
+body.rsmax-light .course-content li.activity.rsmax-area-source {
+    display: none !important;
+}
+body.rsmax-light .course-content li.rsmax-activity-group {
+    list-style: none;
+    margin: 1.4rem 0 .45rem;
+    padding: .65rem .85rem;
+    border-radius: 10px;
+    background: #edf7f3;
+}
+body.rsmax-light .course-content li.rsmax-activity-group h3 {
+    margin: 0;
+    color: #224f49;
+    font-size: .95rem;
+    font-weight: 700;
+}
+body.rsmax-light .course-content .rsmax-group-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+}
+body.rsmax-light .course-content .rsmax-group-toggle::after {
+    content: '−';
+    font-size: 1.2rem;
+    line-height: 1;
+}
+body.rsmax-light .course-content .rsmax-group-toggle[aria-expanded="false"]::after {
+    content: '+';
+}
+body.rsmax-light .course-content .rsmax-group-toggle:focus-visible {
+    outline: 3px solid #078d80;
+    outline-offset: 4px;
+    border-radius: 3px;
+}
+body.rsmax-light .course-content li.activity.rsmax-group-collapsed {
+    display: none !important;
+}
+/* Modo de edición: el área es una franja con su etiqueta, para verla al arrastrar. */
+body.editing .course-content li.activity.modtype_label:has(.rsmax-area) {
+    margin-top: 1.4rem;
+    border: 1px solid #bfe3da !important;
+    border-left: 4px solid #0d8a7c !important;
+    border-radius: 10px;
+    background: #edf7f3 !important;
+}
+body.editing .course-content .rsmax-area {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    color: #224f49;
+    font-size: 1rem;
+    font-weight: 700;
+}
+body.editing .course-content .rsmax-area::before {
+    content: "Área";
+    padding: .1rem .5rem;
+    border-radius: 999px;
+    background: #0d8a7c;
+    color: #fff;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+.course-content .rsmax-area-add {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    margin: .75rem 0 .25rem;
+    padding: .45rem .9rem;
+    border: 1px dashed #0d8a7c;
+    border-radius: 999px;
+    color: #0d6b60;
+    font-size: .9rem;
+    font-weight: 650;
+    text-decoration: none;
+}
+.course-content .rsmax-area-add:hover,
+.course-content .rsmax-area-add:focus-visible {
+    background: #e6f5f1;
+    color: #0d6b60;
+    text-decoration: none;
+}
+/* En el índice del curso, el área es un subtítulo del grupo, no un elemento que abrir. */
+.courseindex .courseindex-item.rsmax-index-area {
+    margin-top: .55rem;
+    padding-top: .2rem;
+    padding-bottom: .2rem;
+    pointer-events: none;
+    .courseindex-link,
+    a {
+        color: #0d6b60 !important;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+    }
+    .completioninfo,
+    .courseindex-cmicon,
+    .icons-collapse-expand {
+        display: none !important;
+    }
+}
+body.editing .courseindex .courseindex-item.rsmax-index-area {
+    pointer-events: auto;
+}

@@ -54,6 +54,14 @@ class banner_form extends \moodleform {
                 banner::SCOPE_ALL => get_string('bannerscope:all', 'theme_rsmax'),
             ]);
             $mform->addHelpButton('scope', 'bannerscope', 'theme_rsmax');
+            // With the classroom every course is light: the choice only exists when it is off.
+            if (!\theme_rsmax\local\classroom::enabled_on_site()) {
+                $mform->addElement('select', 'pagestyle', get_string('pagestyle', 'theme_rsmax'), [
+                banner::STYLE_STAGE => get_string('pagestyle:stage', 'theme_rsmax'),
+                banner::STYLE_LIGHT => get_string('pagestyle:light', 'theme_rsmax'),
+                ]);
+                $mform->addHelpButton('pagestyle', 'pagestyle', 'theme_rsmax');
+            }
         }
 
         $this->add_action_buttons($sectionname !== '');

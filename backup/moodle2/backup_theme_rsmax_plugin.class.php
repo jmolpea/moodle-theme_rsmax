@@ -39,7 +39,7 @@ class backup_theme_rsmax_plugin extends backup_theme_plugin {
     protected function define_course_plugin_structure() {
         // No condition on the theme of the course: the banners belong to the course whatever theme shows it.
         $plugin = $this->get_plugin_element();
-        $wrapper = new backup_nested_element($this->get_recommended_name(), null, ['bannerscope']);
+        $wrapper = new backup_nested_element($this->get_recommended_name(), null, ['bannerscope', 'pagestyle']);
         $sections = new backup_nested_element('sectionbanners');
         $section = new backup_nested_element('sectionbanner', ['id'], ['section']);
         $plugin->add_child($wrapper);
@@ -48,7 +48,7 @@ class backup_theme_rsmax_plugin extends backup_theme_plugin {
 
         // Always one row, with or without options saved for the course.
         $wrapper->set_source_sql(
-            'SELECT c.id, COALESCE(t.bannerscope, 0) AS bannerscope
+            'SELECT c.id, COALESCE(t.bannerscope, 0) AS bannerscope, COALESCE(t.pagestyle, 0) AS pagestyle
                FROM {course} c
           LEFT JOIN {theme_rsmax_course} t ON t.courseid = c.id
               WHERE c.id = ?',
@@ -61,6 +61,18 @@ class backup_theme_rsmax_plugin extends backup_theme_plugin {
 
         $wrapper->annotate_files('theme_rsmax', 'coursebanner', null);
         $section->annotate_files('theme_rsmax', 'sectionbanner', 'id');
+
+        // The presentation of each module, with its photo or video and the files of its texts.
+        $presentations = new backup_nested_element('sectionpresentations');
+        $presentation = new backup_nested_element('sectionpresentation', ['id'], [
+            'sectionid', 'heading', 'description', 'descriptionformat', 'transcript', 'transcriptformat', 'videourl',
+            'videoplaceholder', 'abouttitle', 'aboutsummary', 'about', 'aboutformat', 'timemodified']);
+        $wrapper->add_child($presentations);
+        $presentations->add_child($presentation);
+        $presentation->set_source_table('theme_rsmax_section', ['courseid' => backup::VAR_COURSEID]);
+        foreach (['sectionmedia', 'sectiondescription', 'sectiontranscript', 'sectionabout'] as $area) {
+            $presentation->annotate_files('theme_rsmax', $area, 'sectionid');
+        }
         return $plugin;
     }
 }

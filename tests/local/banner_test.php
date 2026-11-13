@@ -116,6 +116,7 @@ final class banner_test extends \advanced_testcase {
         $this->add_banner($course, banner::AREA_COURSE, 0, 'course.png');
         $this->add_banner($course, banner::AREA_SECTION, $second, 'second.png');
         banner::set_scope($course->id, banner::SCOPE_ALL);
+        banner::set_style($course->id, banner::STYLE_LIGHT);
 
         $bc = new \backup_controller(
             \backup::TYPE_1COURSE,
@@ -146,8 +147,31 @@ final class banner_test extends \advanced_testcase {
         $newsecond = (int) get_fast_modinfo($newid)->get_section_info(2)->id;
         $this->assertNotEquals($second, $newsecond);
         $this->assertSame(banner::SCOPE_ALL, $copy['scope']);
+        $this->assertSame(banner::STYLE_LIGHT, $copy['style']);
         $this->assertStringEndsWith('/course.png', $copy['course']);
         $this->assertSame([$newsecond], array_keys($copy['sections']));
         $this->assertStringEndsWith('/second.png', $copy['sections'][$newsecond]);
+    }
+
+    /**
+     * The look of the pages is an option of each course; setting it keeps the other options.
+     * The option only counts with the classroom off: the classroom makes every course light.
+     */
+    public function test_page_style(): void {
+        $this->resetAfterTest();
+        $course = $this->getDataGenerator()->create_course();
+        $this->assertTrue(banner::is_light($course->id));
+
+        set_config('classroom', 0, 'theme_rsmax');
+        $this->assertFalse(banner::is_light($course->id));
+
+        banner::set_scope($course->id, banner::SCOPE_ALL);
+        banner::set_style($course->id, banner::STYLE_LIGHT);
+        $this->assertTrue(banner::is_light($course->id));
+        $this->assertSame(banner::SCOPE_ALL, banner::get($course->id)['scope']);
+
+        // Anything that is not the light style is the stage.
+        banner::set_style($course->id, 7);
+        $this->assertFalse(banner::is_light($course->id));
     }
 }

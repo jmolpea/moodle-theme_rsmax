@@ -30,9 +30,13 @@ require_once($CFG->dirroot . '/course/lib.php');
 // Add block button in editing mode.
 $addblockbutton = $OUTPUT->addblockbutton();
 
+// A course with light pages keeps the AI assistant in the side panel, so the panel starts open.
+$lightcourse = !empty($PAGE->course->id) && $PAGE->course->id != SITEID
+    && \theme_rsmax\local\banner::is_light((int) $PAGE->course->id);
+
 if (isloggedin()) {
     $courseindexopen = (get_user_preferences('drawer-open-index', true) == true);
-    $blockdraweropen = (get_user_preferences('drawer-open-block') == true);
+    $blockdraweropen = (get_user_preferences('drawer-open-block', $lightcourse) == true);
 } else {
     $courseindexopen = false;
     $blockdraweropen = false;
@@ -43,6 +47,14 @@ if (defined('BEHAT_SITE_RUNNING') && get_user_preferences('behat_keep_drawer_clo
 }
 
 $extraclasses = ['uses-drawers'];
+if ($lightcourse) {
+    $extraclasses[] = 'rsmax-light';
+}
+// The RSMAX classroom: the design of the theme inside every course (theme_rsmax\local\classroom).
+$aula = !empty($PAGE->course->id) && \theme_rsmax\local\classroom::enabled((int) $PAGE->course->id);
+if ($aula) {
+    $extraclasses[] = \theme_rsmax\local\classroom::BODYCLASS;
+}
 if ($courseindexopen) {
     $extraclasses[] = 'drawer-open-index';
 }
@@ -57,12 +69,17 @@ if ($PAGE->pagelayout == 'incourse' && !in_array($PAGE->pagetype, THEME_RSMAX_WI
 $blockshtml = $OUTPUT->blocks('side-pre');
 // The AI assistant: the one of the site comes to the catalogue and the enrolment pages, the one of
 // a course to its activities. With the floating button it needs no place on the page; without it,
-// it goes with the blocks of the panel.
+// it goes with the blocks of the panel. In a course with light pages it always goes in the panel,
+// first, with the other blocks of the course under it.
 $assistant = \theme_rsmax\local\assistant::for_page($PAGE, $OUTPUT);
 $assistantholder = '';
 if ($assistant['block'] !== '') {
     $end = strrpos($blockshtml, '</aside>');
-    if ($assistant['floating'] || $end === false) {
+    $start = strpos($blockshtml, '<aside');
+    $start = $start === false ? false : strpos($blockshtml, '>', $start);
+    if ($lightcourse && $start !== false) {
+        $blockshtml = substr_replace($blockshtml, $assistant['block'], $start + 1, 0);
+    } else if ($assistant['floating'] || $end === false) {
         $assistantholder = $assistant['block'];
     } else {
         $blockshtml = substr_replace($blockshtml, $assistant['block'], $end, 0);
@@ -113,6 +130,21 @@ if ($courseindex || $hasblocks) {
 
 $secondarynavigation = false;
 $overflow = '';
+// Classroom, learners: only the course and «My submissions» (grades and feedback). Teachers keep every tab.
+$aulalearner = $aula && !has_capability('moodle/course:update', context_course::instance($PAGE->course->id));
+if ($aulalearner && $PAGE->has_secondary_navigation()) {
+    foreach ($PAGE->secondarynav->children->get_key_list() as $navkey) {
+        $navnode = $PAGE->secondarynav->get($navkey);
+        if (!$navnode) {
+            continue;
+        }
+        if ($navkey === 'grades') {
+            $navnode->text = get_string('mysubmissions', 'theme_rsmax');
+        } else if ($navkey !== 'coursehome') {
+            $navnode->remove();
+        }
+    }
+}
 if ($PAGE->has_secondary_navigation()) {
     $tablistnav = $PAGE->has_tablist_secondary_navigation();
     $moremenu = new \core\navigation\output\more_menu($PAGE->secondarynav, 'nav-tabs', true, $tablistnav);
@@ -175,6 +207,126 @@ $oncoursehome = $incourse && $PAGE->pagelayout == 'course' && !str_starts_with($
 if ($oncoursehome && !empty($settings->courseheader) && !$PAGE->user_is_editing()) {
     $coursehero = \theme_rsmax\local\course_header::export($PAGE->course);
     $coursehero['progress'] = $progress;
+    $coursehero['isaula'] = $aula;
+    // Classroom: only a banner uploaded for the course darkens the header; the course image does not.
+    $coursehero['banneraula'] = $aula ? \theme_rsmax\local\banner::for_page($PAGE->course->id, 0, true) : '';
+    if ($aula && $progress) {
+        // Every section but the first one is a module; the first one is the area of general resources.
+        $coursehero['modules'] = array_values(array_filter(
+            $progress['sections'],
+            static fn($section) => $section['sectionnumber'] >= 1
+        ));
+        $coursehero['hasmodules'] = !empty($coursehero['modules']);
+        // The «your next step» header: greeting, the module in progress, what is left and one place to continue.
+        $coursehero['firstname'] = format_string($USER->firstname);
+        $done = 0;
+        $current = null;
+        foreach ($coursehero['modules'] as $index => $module) {
+            $names = \theme_rsmax\local\classroom::split_section_name(
+                html_entity_decode(strip_tags($module['name']), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+                (int) $module['sectionnumber']
+            );
+            $coursehero['modules'][$index] = $names + $coursehero['modules'][$index];
+            $coursehero['modules'][$index]['iscurrent'] = false;
+            if ($module['iscomplete']) {
+                $done++;
+            } else if ($current === null && !$module['islocked']) {
+                $current = $index;
+            }
+        }
+        if ($current !== null) {
+            $coursehero['modules'][$current]['iscurrent'] = true;
+        }
+        // The header follows the module tab on screen (format_onetopic: ?section=N, or the last
+        // tab the learner opened). Without one, or on General, it shows the module in progress.
+        $shownsection = $PAGE->url->get_param('section');
+        if ($shownsection === null) {
+            $shownsection = $USER->display[$PAGE->course->id] ?? null;
+        }
+        $shown = $current;
+        foreach ($coursehero['modules'] as $index => $module) {
+            if ($shownsection !== null && (int) $module['sectionnumber'] === (int) $shownsection) {
+                $shown = $index;
+            }
+        }
+        if ($shown !== null) {
+            $coursehero['modules'][$shown]['isselected'] = true;
+            $module = $coursehero['modules'][$shown];
+            $previous = $shown > 0 ? $coursehero['modules'][$shown - 1] : null;
+            $coursehero['current'] = [
+                'short' => $module['short'],
+                'title' => $module['title'],
+                'remaining' => $module['total'] - $module['completed'],
+                'completed' => $module['completed'],
+                'total' => $module['total'],
+                'iscomplete' => $module['iscomplete'],
+                'islocked' => $module['islocked'],
+                'isinprogress' => !$module['iscomplete'] && !$module['islocked'],
+                'hasshort' => $module['hasshort'],
+                'previous' => $previous ? ($previous['hasshort'] ? $previous['short'] : '«' . $previous['title'] . '»') : '',
+            ];
+        }
+        $coursehero['modulesdone'] = $done;
+        $coursehero['modulestotal'] = count($coursehero['modules']);
+        // Up to twelve modules in a row; on a phone, up to six.
+        $coursehero['columns'] = max(1, min(12, count($coursehero['modules'])));
+        $coursehero['columnsphone'] = max(1, min(6, count($coursehero['modules'])));
+        // Where to continue: inside the module on screen when it still has something open to do;
+        // otherwise the learner's next step in the course, saying which module it belongs to.
+        $aulamodinfo = get_fast_modinfo($PAGE->course);
+        $nextcm = null;
+        $shownmodule = $shown !== null ? $coursehero['modules'][$shown] : null;
+        if ($shownmodule && !$shownmodule['iscomplete'] && !$shownmodule['islocked']) {
+            if (!empty($progress['next'])) {
+                $candidate = $aulamodinfo->get_cm($progress['next']['id']);
+                if ((int) $candidate->sectionnum === (int) $shownmodule['sectionnumber']) {
+                    $nextcm = $candidate;
+                }
+            }
+            if (!$nextcm) {
+                $aulacompletion = new \completion_info($PAGE->course);
+                foreach ($aulamodinfo->sections[$shownmodule['sectionnumber']] ?? [] as $aulacmid) {
+                    $aulacm = $aulamodinfo->get_cm($aulacmid);
+                    $counts = $aulacm->uservisible && $aulacm->url && !$aulacm->deletioninprogress;
+                    if (!$counts || !$aulacompletion->is_enabled($aulacm)) {
+                        continue;
+                    }
+                    $aulastate = $aulacompletion->get_data($aulacm, true, $USER->id)->completionstate;
+                    if ($aulastate != COMPLETION_COMPLETE && $aulastate != COMPLETION_COMPLETE_PASS) {
+                        $nextcm = $aulacm;
+                        break;
+                    }
+                }
+            }
+        }
+        $inshown = (bool) $nextcm;
+        if (!$nextcm && !empty($progress['next'])) {
+            $nextcm = $aulamodinfo->get_cm($progress['next']['id']);
+        }
+        if ($nextcm) {
+            $nextmeta = \theme_rsmax\local\activity_meta::for_cm($nextcm);
+            $nextsection = \theme_rsmax\local\classroom::split_section_name(
+                html_entity_decode(
+                    strip_tags(get_section_name($PAGE->course, $nextcm->get_section_info())),
+                    ENT_QUOTES | ENT_HTML5,
+                    'UTF-8'
+                ),
+                (int) $nextcm->sectionnum
+            );
+            $coursehero['nextinfo'] = [
+                'name' => \theme_rsmax\local\activity_meta::clean(html_entity_decode(
+                    strip_tags($nextcm->get_formatted_name()),
+                    ENT_QUOTES | ENT_HTML5,
+                    'UTF-8'
+                )),
+                'url' => $nextcm->url->out(false),
+                'kind' => $nextmeta[0] ?? '',
+                'duration' => $nextmeta[1] ?? '',
+                'module' => $nextsection['hasshort'] ? $nextsection['short'] : $nextsection['title'],
+                'inshown' => $inshown,
+            ];
+        }
+    }
     // A banner uploaded for the course replaces the course image, which is made for cards.
     $coursehero['image'] = \theme_rsmax\local\banner::for_page($PAGE->course->id, 0, true) ?: $coursehero['image'];
     $extraclasses[] = 'rsmax-hascoursehero';
@@ -346,6 +498,122 @@ if (isset($settings->footerhelp) && empty($settings->footerhelp)) {
     $bodyattributes = $OUTPUT->body_attributes($extraclasses);
 }
 
+// Classroom: one vocabulary (names without codes, the type in words and the duration on every
+// list), the presentation of each module, the delivery panel of the tasks and the assistant's prompts.
+$presentationshtml = '';
+if ($aula) {
+    $aulastrings = [];
+    foreach (
+        ['readfull', 'readless', 'readmore', 'step', 'editpresentation', 'addpresentation', 'delivery', 'state', 'attempt',
+            'grade', 'notsent', 'editsubmission', 'addsubmission', 'seefeedback', 'stuck'] as $key
+    ) {
+        $aulastrings[$key] = get_string('aula:' . $key, 'theme_rsmax', (object) ['step' => '{$a->step}', 'total' => '{$a->total}']);
+    }
+    $presentations = false;
+    if ($PAGE->pagelayout === 'course') {
+        $editingpresentations = $PAGE->user_is_editing() && has_capability('moodle/course:update', $PAGE->context);
+        foreach (\theme_rsmax\local\section_presentation::export_for_course($PAGE->course) as $one) {
+            $presentationshtml .= $OUTPUT->render_from_template('theme_rsmax/section_presentation', $one);
+        }
+        if ($presentationshtml !== '' || $editingpresentations) {
+            $presentations = [
+                'editing' => $editingpresentations,
+                'url' => (new moodle_url('/theme/rsmax/presentation.php'))->out(false),
+            ];
+        }
+    }
+    if (!$PAGE->user_is_editing() && isloggedin() && !isguestuser()) {
+        $name = $PAGE->cm ? html_entity_decode(strip_tags($PAGE->cm->get_formatted_name()), ENT_QUOTES | ENT_HTML5, 'UTF-8') : '';
+        $promptset = 'course';
+        if ($PAGE->cm && in_array($PAGE->cm->modname, ['page', 'assign'])) {
+            $promptset = $PAGE->cm->modname;
+        }
+        $prompts = [];
+        foreach ([1, 2, 3] as $n) {
+            $prompts[] = [
+                'label' => get_string("prompt:{$promptset}:{$n}label", 'theme_rsmax'),
+                'text' => get_string("prompt:{$promptset}:{$n}text", 'theme_rsmax', $name),
+            ];
+        }
+        $PAGE->requires->js_call_amd('theme_rsmax/course_groups', 'assistantSuggestions', [
+            $prompts,
+            get_string('prompt:suggested', 'theme_rsmax'),
+        ]);
+    }
+
+    $aulameta = [];
+    $aulastep = null;
+    $aulamodinfo = get_fast_modinfo($PAGE->course);
+    $allmeta = \theme_rsmax\local\activity_meta::for_course($PAGE->course);
+    foreach ($aulamodinfo->get_cms() as $aulacm) {
+        if (!$aulacm->uservisible && !$aulacm->is_visible_on_course_page()) {
+            continue;
+        }
+        if (isset($allmeta[(int) $aulacm->id])) {
+            $aulameta[(int) $aulacm->id] = $allmeta[(int) $aulacm->id];
+        }
+    }
+    if ($PAGE->cm) {
+        $steps = [];
+        foreach ($aulamodinfo->sections[$PAGE->cm->sectionnum] ?? [] as $aulacmid) {
+            $aulacm = $aulamodinfo->get_cm($aulacmid);
+            if ($aulacm->modname !== 'label' && $aulacm->modname !== 'subsection' && $aulacm->is_visible_on_course_page()) {
+                $steps[] = (int) $aulacm->id;
+            }
+        }
+        $position = array_search((int) $PAGE->cm->id, $steps, true);
+        if ($position !== false) {
+            $stepsection = \theme_rsmax\local\classroom::split_section_name(
+                html_entity_decode(
+                    strip_tags(get_section_name($PAGE->course, $PAGE->cm->get_section_info())),
+                    ENT_QUOTES | ENT_HTML5,
+                    'UTF-8'
+                ),
+                (int) $PAGE->cm->sectionnum
+            );
+            $aulastep = [
+                'module' => $stepsection['hasshort'] ? $stepsection['short'] : $stepsection['title'],
+                'step' => $position + 1,
+                'total' => count($steps),
+            ];
+        }
+    }
+    $PAGE->requires->js_call_amd('theme_rsmax/aula', 'init', [[
+        'meta' => (object) ($PAGE->user_is_editing() ? [] : $aulameta),
+        'step' => $aulastep,
+        'assign' => $PAGE->cm && $PAGE->cm->modname === 'assign' && !$PAGE->user_is_editing(),
+        'strings' => $aulastrings,
+        'presentations' => $presentations,
+    ]]);
+}
+// Areas: labels marked as areas become headings that group the activities under them. They are
+// presentation only: sections, restrictions and completion stay intact (theme_rsmax\local\course_areas).
+if ($incourse && $PAGE->pagelayout === 'course') {
+    if ($aula && $PAGE->course->format === 'onetopic' && !$PAGE->user_is_editing()) {
+        $PAGE->requires->js_call_amd('theme_rsmax/overflow_tabs', 'init', [[
+            'more' => get_string('tabs:more', 'theme_rsmax'),
+            'current' => get_string('tabs:morecurrent', 'theme_rsmax', '{$a}'),
+        ]]);
+    }
+    if ($PAGE->user_is_editing()) {
+        if (has_capability('moodle/course:manageactivities', $PAGE->context)) {
+            $PAGE->requires->js_call_amd('theme_rsmax/course_groups', 'editAreas', [[
+                'courseid' => (int) $PAGE->course->id,
+                'url' => (new moodle_url('/theme/rsmax/area.php'))->out(false),
+                'label' => get_string('area:add', 'theme_rsmax'),
+                'areas' => array_column(\theme_rsmax\local\course_areas::for_course($PAGE->course), 'id'),
+            ]]);
+        }
+    } else {
+        $groups = array_map(
+            static fn($area) => $area + ['source' => true],
+            \theme_rsmax\local\course_areas::for_course($PAGE->course)
+        );
+        if ($groups) {
+            $PAGE->requires->js_call_amd('theme_rsmax/course_groups', 'init', [$groups]);
+        }
+    }
+}
 $templatecontext = [
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
     'coursefullname' => $coursefullname,
@@ -382,6 +650,7 @@ $templatecontext = [
     'coursehero' => $coursehero,
     'assistantholder' => $assistantholder,
     'homehero' => $homehero,
+    'presentationshtml' => $presentationshtml,
 ];
 
 echo $OUTPUT->render_from_template('theme_rsmax/drawers', $templatecontext);

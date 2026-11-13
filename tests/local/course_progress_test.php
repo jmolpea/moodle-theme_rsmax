@@ -107,6 +107,39 @@ final class course_progress_test extends \advanced_testcase {
     }
 
     /**
+     * A locked section shown to the learner counts towards the total; one hidden from them does not.
+     */
+    public function test_locked_sections_count(): void {
+        global $DB;
+        $this->resetAfterTest();
+        set_config('enableavailability', 1);
+        $generator = $this->getDataGenerator();
+        $course = $generator->create_course(['enablecompletion' => 1, 'numsections' => 2]);
+        $student = $generator->create_and_enrol($course, 'student');
+        $first = $generator->create_module('page', ['course' => $course->id, 'section' => 1,
+            'completion' => COMPLETION_TRACKING_MANUAL]);
+        $generator->create_module('page', ['course' => $course->id, 'section' => 2,
+            'completion' => COMPLETION_TRACKING_MANUAL]);
+        $generator->create_module('page', ['course' => $course->id, 'section' => 2,
+            'completion' => COMPLETION_TRACKING_MANUAL]);
+
+        // Section 2 opens when the page of section 1 is done, and says so.
+        $condition = ['op' => '&', 'c' => [['type' => 'completion', 'cm' => (int) $first->cmid, 'e' => 1]], 'showc' => [true]];
+        $DB->set_field('course_sections', 'availability', json_encode($condition), ['course' => $course->id, 'section' => 2]);
+        rebuild_course_cache($course->id, true);
+
+        $progress = course_progress::get_for_user($course, $student->id);
+        $this->assertSame(3, $progress['total']);
+        $this->assertSame((int) $first->cmid, $progress['next']['id']);
+
+        // Hidden entirely, it is not part of what the learner is asked to do.
+        $condition['showc'] = [false];
+        $DB->set_field('course_sections', 'availability', json_encode($condition), ['course' => $course->id, 'section' => 2]);
+        rebuild_course_cache($course->id, true);
+        $this->assertSame(1, course_progress::get_for_user($course, $student->id)['total']);
+    }
+
+    /**
      * There is nothing to show without completion, for untracked users or with no tracked activities.
      */
     public function test_nothing_to_show(): void {

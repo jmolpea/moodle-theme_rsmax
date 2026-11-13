@@ -348,6 +348,8 @@ body.pagelayout-mycourses {
 // panel's padding in between, and the tab has its own margin on top of that: together, a gap of
 // 56px. Here the tab touches what it opens next to. $inset is how far inside the column the
 // content starts, on the pages where the column itself has no frame.
+// The unit stays: the value goes into calc(), where a bare 0 is not a length.
+/* stylelint-disable-next-line length-zero-no-unit */
 @mixin rsmax-drawer-tabs($inset: 0px) {
     $gap: calc(#{$drawer-main-gap} + 28px + #{$inset});
     // On a window too narrow for the column, the tab stays at the edge of the content.
@@ -2343,7 +2345,8 @@ body.pagelayout-incourse {
 
             &[data-rsmax-replies="many"] > td.p-0.text-center.fit-content {
                 color: $rsmax-stage-bg;
-                background: map-get($rsmax-purposes, interactivecontent) !important; /* stylelint-disable-line declaration-no-important */
+                /* stylelint-disable-next-line declaration-no-important */
+                background: map-get($rsmax-purposes, interactivecontent) !important;
             }
 
             > .topic {
@@ -4750,39 +4753,41 @@ body:not(.editing) .course-content {
 // the header of the activities; the section names carry what the learner has done in each.
 // ---------------------------------------------------------------------------------------------
 // The menu of the site on a phone is a left panel too: it has a look of its own, further down.
-.drawer.drawer-left:not(.drawer-primary) {
+// The course index panel, drawn in the colours it is given: dark by default, light in courses
+// with light pages.
+@mixin rsmax-index-panel($bg, $fg, $mark, $islight) {
     border: 0;
-    color: rgba($rsmax-index-fg, .78);
-    background: $rsmax-index;
-    scrollbar-color: rgba($rsmax-index-fg, .25) transparent;
+    color: rgba($fg, .78);
+    background: $bg;
+    scrollbar-color: rgba($fg, .25) transparent;
     scrollbar-width: thin;
 
     .drawerheader {
-        border-bottom: 1px solid rgba($rsmax-index-fg, .1);
-        background: $rsmax-index;
+        border-bottom: 1px solid rgba($fg, .1);
+        background: $bg;
 
         .drawerheading #courseindexdrawerheading .courseindex-link {
             margin-left: 0 !important; /* stylelint-disable-line declaration-no-important */
-            color: $rsmax-index-fg;
+            color: $fg;
             font-size: .9375rem;
             letter-spacing: -.01em;
 
             &:hover,
             &:focus {
-                color: $rsmax-index-mark;
+                color: $mark;
             }
         }
 
         .drawertoggle {
             border-radius: 50%;
-            background: rgba($rsmax-index-fg, .08);
+            background: rgba($fg, .08);
 
             &:hover,
             &:focus {
-                background: rgba($rsmax-index-fg, .18);
+                background: rgba($fg, .18);
             }
 
-            @if $rsmax-index-light {
+            @if $islight {
                 .icon {
                     filter: invert(1);
                 }
@@ -4797,11 +4802,11 @@ body:not(.editing) .course-content {
     .courseindex-collapsemenu,
     .collapseall,
     .expandall {
-        color: rgba($rsmax-index-fg, .55);
+        color: rgba($fg, .55);
 
         &:hover,
         &:focus {
-            color: $rsmax-index-fg;
+            color: $fg;
         }
     }
 
@@ -4810,7 +4815,7 @@ body:not(.editing) .course-content {
         padding: .45rem .6rem;
         border: 0;
         border-radius: .7rem;
-        color: rgba($rsmax-index-fg, .74);
+        color: rgba($fg, .74);
         transition: background-color .12s ease, color .12s ease;
 
         .courseindex-link,
@@ -4828,23 +4833,23 @@ body:not(.editing) .course-content {
         &:hover .courseindex-chevron,
         &:focus .courseindex-link,
         &:focus .courseindex-chevron {
-            color: $rsmax-index-fg;
+            color: $fg;
         }
 
         &:hover,
         &:focus {
-            background: rgba($rsmax-index-fg, .08);
+            background: rgba($fg, .08);
         }
 
         &.dimmed,
         &.dimmed .courseindex-link,
         &.dimmed .courseindex-chevron {
-            color: rgba($rsmax-index-fg, .42);
+            color: rgba($fg, .42);
         }
 
         &.active {
             border: 0;
-            background: rgba($rsmax-index-fg, .1);
+            background: rgba($fg, .1);
         }
 
         // The page the learner is on.
@@ -4868,15 +4873,15 @@ body:not(.editing) .course-content {
             min-width: 1.25rem;
 
             &.completion_complete {
-                color: $rsmax-index-mark;
+                color: $mark;
             }
 
             &.completion_incomplete {
-                color: rgba($rsmax-index-fg, .38);
+                color: rgba($fg, .38);
             }
 
             &.completion_fail {
-                color: mix($rsmax-bad, $rsmax-index-fg, 70%);
+                color: mix($rsmax-bad, $fg, 70%);
             }
         }
 
@@ -4895,22 +4900,22 @@ body:not(.editing) .course-content {
         margin-top: .35rem;
         padding-top: .55rem;
         padding-bottom: .55rem;
-        color: $rsmax-index-fg;
+        color: $fg;
 
         // The section being read is marked more quietly than the page the learner is on.
         &.pageitem,
         &.pageitem:hover,
         &.pageitem:focus {
-            color: $rsmax-index-fg;
-            background: rgba($rsmax-index-fg, .13);
+            color: $fg;
+            background: rgba($fg, .13);
 
             a,
             .courseindex-link {
-                color: $rsmax-index-fg;
+                color: $fg;
             }
 
             .courseindex-chevron {
-                color: rgba($rsmax-index-fg, .5);
+                color: rgba($fg, .5);
             }
         }
 
@@ -4923,31 +4928,31 @@ body:not(.editing) .course-content {
         }
 
         .courseindex-chevron {
-            color: rgba($rsmax-index-fg, .5);
+            color: rgba($fg, .5);
         }
 
         .rsmax-meter {
             padding-left: .5rem;
-            color: rgba($rsmax-index-fg, .6);
+            color: rgba($fg, .6);
             font-size: .75rem;
         }
 
         .rsmax-meter-ring {
             width: 1.15rem;
             height: 1.15rem;
-            background: conic-gradient($rsmax-index-mark calc(var(--rsmax-meter, 0) * 1%), rgba($rsmax-index-fg, .2) 0);
+            background: conic-gradient($mark calc(var(--rsmax-meter, 0) * 1%), rgba($fg, .2) 0);
             mask: radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3px));
         }
 
         .rsmax-meter.is-complete {
-            color: $rsmax-index-mark;
+            color: $mark;
 
             .rsmax-meter-ring {
-                background: $rsmax-index-mark;
+                background: $mark;
                 mask: none;
 
                 &::after {
-                    color: $rsmax-index;
+                    color: $bg;
                     font-size: .55rem;
                 }
             }
@@ -4963,14 +4968,18 @@ body:not(.editing) .course-content {
         }
 
         .current-badge {
-            color: $rsmax-index;
-            background: $rsmax-index-mark !important; /* stylelint-disable-line declaration-no-important */
+            color: $bg;
+            background: $mark !important; /* stylelint-disable-line declaration-no-important */
         }
     }
 
     .courseindex .icon {
         color: inherit;
     }
+}
+
+.drawer.drawer-left:not(.drawer-primary) {
+    @include rsmax-index-panel($rsmax-index, $rsmax-index-fg, $rsmax-index-mark, $rsmax-index-light);
 }
 
 // The panel of blocks on the other side stays light, in the tone of the paper.
@@ -8435,7 +8444,8 @@ $rsmax-dark-card: lighten($rsmax-stage-bg, 6%);
 
 [data-bs-theme="dark"] {
     --bs-body-bg: #{lighten($rsmax-stage-bg, 2%)};
-    --bs-body-bg-rgb: #{red(lighten($rsmax-stage-bg, 2%))}, #{green(lighten($rsmax-stage-bg, 2%))}, #{blue(lighten($rsmax-stage-bg, 2%))};
+    $rsmax-dark-body: lighten($rsmax-stage-bg, 2%);
+    --bs-body-bg-rgb: #{red($rsmax-dark-body)}, #{green($rsmax-dark-body)}, #{blue($rsmax-dark-body)};
     --bs-tertiary-bg: #{lighten($rsmax-stage-bg, 6%)};
     --bs-secondary-bg: #{lighten($rsmax-stage-bg, 9%)};
     --bs-border-color: #{rgba($white, .14)};
@@ -9157,5 +9167,372 @@ body .block-aicourserecommender .aicr-mic:not(.aicr-recording) {
         &::after {
             animation: none;
         }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Light pages: an option of each course (page of banners). The headers of the course, its sections
+// and its activities lie on the paper with the text in ink; the course index is a light panel; the
+// bar between pages closes the page instead of floating over it; activity icons take one quiet
+// tone, so colour is left for what the learner has to act on: the next step and what is done.
+// ---------------------------------------------------------------------------------------------
+$rsmax-light-line: rgba($rsmax-stage-bg, .1);
+$rsmax-light-muted: rsmax-readable(mix($rsmax-stage-bg, $rsmax-sheet, 62%), $rsmax-sheet);
+
+body.rsmax-light {
+    // Headers of sections and activities.
+    .rsmax-stage,
+    .rsmax-stage.rsmax-hasbanner {
+        margin-bottom: .5rem;
+        border-radius: 0;
+        color: var(--bs-body-color);
+        background: none;
+
+        &::before,
+        &::after {
+            display: none;
+        }
+
+        #page-header {
+            padding: .5rem 0 1rem;
+
+            .breadcrumb-item,
+            .breadcrumb-item::before {
+                color: $rsmax-light-muted;
+            }
+
+            .breadcrumb-item a {
+                color: var(--bs-body-color);
+
+                &:hover,
+                &:focus {
+                    color: var(--rsmax-primary-text);
+                }
+            }
+
+            .page-header-headings h1 {
+                max-width: 32ch;
+                color: var(--bs-heading-color);
+                font-size: clamp(1.6rem, 3.4vw, 2.25rem);
+                letter-spacing: -.025em;
+            }
+
+            .page-header-image {
+                width: 3rem;
+                height: 3rem;
+                border-radius: .8rem;
+                background: var(--rsmax-sheet);
+                box-shadow: 0 0 0 1px $rsmax-light-line;
+            }
+
+            .btn {
+                border-color: $rsmax-light-line;
+                color: var(--bs-body-color);
+                background: var(--rsmax-sheet);
+            }
+
+            .activity-completion-status .completion-status {
+                color: var(--bs-body-color) !important; /* stylelint-disable-line declaration-no-important */
+                background: rgba($rsmax-stage-bg, .07);
+
+                &.text-success {
+                    color: var(--rsmax-good-text) !important; /* stylelint-disable-line declaration-no-important */
+                    background: var(--rsmax-good-soft);
+                }
+            }
+
+            [data-region="activity-dates"] .date-item,
+            [data-region="activity-dates"] > div,
+            .activity-dates .date-item,
+            .activity-dates > div {
+                color: var(--bs-body-color);
+                background: rgba($rsmax-stage-bg, .06);
+            }
+        }
+    }
+
+    // One line above the title: the way back. The course percentage and the position in the
+    // section are said elsewhere, once.
+    .rsmax-stage-top {
+        padding: 0;
+    }
+
+    .rsmax-stage-course,
+    .rsmax-stage-where a,
+    .rsmax-stage-side a {
+        color: $rsmax-light-muted;
+
+        &:hover,
+        &:focus {
+            color: var(--rsmax-primary-text);
+        }
+    }
+
+    .rsmax-stage-kind {
+        color: $rsmax-light-muted;
+        background: rgba($rsmax-stage-bg, .06);
+        letter-spacing: .06em;
+    }
+
+    .rsmax-stage-progress,
+    .rsmax-stage-stops,
+    .rsmax-stage-where span {
+        display: none;
+    }
+
+    .rsmax-stage-route {
+        padding: .25rem 0 0;
+        border: 0;
+        background: none;
+    }
+
+    .rsmax-stage-sectionprogress {
+        color: $rsmax-light-muted;
+
+        .rsmax-stage-progressbar {
+            background: rgba($rsmax-stage-bg, .1);
+        }
+
+        &.is-complete {
+            color: var(--rsmax-good-text);
+        }
+    }
+
+    // Header of the course page.
+    .rsmax-coursehero {
+        border: 1px solid $rsmax-light-line;
+        color: var(--bs-body-color);
+        background: var(--rsmax-sheet);
+
+        &::before {
+            display: none;
+        }
+    }
+
+    .rsmax-coursehero-category {
+        color: $rsmax-light-muted;
+        background: rgba($rsmax-stage-bg, .06);
+    }
+
+    .rsmax-coursehero-title,
+    .rsmax-coursehero-label {
+        color: var(--bs-heading-color);
+    }
+
+    .rsmax-coursehero-teachers,
+    .rsmax-coursehero-count {
+        color: $rsmax-light-muted;
+    }
+
+    .rsmax-ring::before {
+        background: conic-gradient(var(--rsmax-accent) calc(var(--rsmax-ring, 0) * 1%), rgba($rsmax-stage-bg, .1) 0);
+    }
+
+    .rsmax-coursehero-next {
+        border-top: 1px solid $rsmax-light-line;
+        color: var(--bs-body-color);
+        background: var(--rsmax-accent-soft);
+
+        &:hover,
+        &:focus {
+            color: var(--bs-body-color);
+            background: mix($rsmax-accent, $rsmax-sheet, 22%);
+        }
+    }
+
+    .rsmax-coursehero-next-label {
+        color: var(--bs-body-color);
+    }
+
+    // The course index: a light panel, the page the learner is on marked by a tint.
+    .drawer.drawer-left:not(.drawer-primary) {
+        border-right: 1px solid $rsmax-light-line;
+
+        @include rsmax-index-panel($rsmax-sheet, $rsmax-stage-bg, $rsmax-good, false);
+
+        .courseindex .courseindex-item.pageitem,
+        .courseindex .courseindex-item.pageitem:hover,
+        .courseindex .courseindex-item.pageitem:focus {
+            color: $rsmax-stage-bg;
+            background: var(--rsmax-accent-soft);
+
+            a,
+            .courseindex-link,
+            .courseindex-chevron,
+            .completioninfo {
+                color: $rsmax-stage-bg;
+            }
+        }
+    }
+
+    .drawer.drawer-right {
+        border-left: 1px solid $rsmax-light-line;
+        background: var(--rsmax-sheet);
+    }
+
+    .drawer-toggles .drawer-toggler .btn {
+        border: 1px solid $rsmax-light-line;
+        color: $rsmax-stage-bg;
+        background-color: var(--rsmax-sheet);
+
+        .icon {
+            filter: none;
+        }
+
+        &:hover,
+        &:focus {
+            color: color-contrast($primary);
+            background-color: $primary;
+        }
+    }
+
+    // Activity icons: one quiet tone. What kind of activity it is, its label already says.
+    .activityiconcontainer {
+        background-color: rgba($rsmax-stage-bg, .06) !important; /* stylelint-disable-line declaration-no-important */
+
+        .activityicon,
+        .icon {
+            filter: brightness(0) opacity(.62) !important; /* stylelint-disable-line declaration-no-important */
+        }
+    }
+
+    // Reading pages and links are done by opening them: the box of conditions only repeats it.
+    &.path-mod-page,
+    &.path-mod-resource,
+    &.path-mod-url,
+    &.path-mod-book {
+        .activity-information {
+            display: none;
+        }
+    }
+
+    // The bar between pages closes the page, after the content, instead of floating over it.
+    &.hasstickyfooter:has(.rsmax-dock) {
+        /* stylelint-disable-next-line length-zero-no-unit */
+        --sticky-footer-total-height: 0px;
+    }
+
+    .stickyfooter:has(.rsmax-dock) {
+        position: static;
+        width: auto;
+        margin-top: 1.5rem;
+        // Boost pads the fixed bar for the open panels; in the flow of the page it needs none.
+        padding: 0 !important; /* stylelint-disable-line declaration-no-important */
+
+        // The wrapper keeps the room of the open panels as a margin: none in the flow of the page.
+        .sticky-footer-content-wrapper,
+        .sticky-footer-content {
+            width: 100%;
+            height: auto;
+            margin: 0 !important; /* stylelint-disable-line declaration-no-important */
+            padding: 0 !important; /* stylelint-disable-line declaration-no-important */
+        }
+    }
+
+    .rsmax-dock {
+        width: 100%;
+        margin: 0;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 1rem;
+        padding: 0;
+        border: 0;
+        color: var(--bs-body-color);
+        background: none;
+        box-shadow: none;
+        backdrop-filter: none;
+    }
+
+    .rsmax-dock-middle {
+        display: none;
+    }
+
+    .rsmax-dock .rsmax-dock-link,
+    .rsmax-dock .rsmax-dock-next {
+        width: 100%;
+        padding: .8rem 1rem;
+        border: 1px solid $rsmax-light-line;
+        border-radius: 1rem;
+        color: var(--bs-body-color);
+        background: var(--rsmax-sheet);
+
+        &:hover,
+        &:focus {
+            border-color: var(--rsmax-accent);
+            background: var(--rsmax-sheet);
+        }
+    }
+
+    .rsmax-dock .rsmax-dock-next {
+        justify-content: flex-end;
+
+        .rsmax-dock-arrow {
+            color: color-contrast($primary);
+            background: $primary;
+        }
+    }
+
+    .rsmax-dock-arrow {
+        background: rgba($rsmax-stage-bg, .07);
+    }
+
+    // The assistant lives in the side panel, so the floating button is not needed.
+    .rsmax-assistant-button {
+        display: none;
+    }
+}
+
+body.rsmax-light {
+    // Sections shown as tabs (formats such as One Topic): one line that scrolls sideways, not a wall
+    // of buttons. Locked sections stay in the line, quiet, so the whole course is always in view.
+    .tabs-wrapper .nav-tabs {
+        flex-wrap: nowrap;
+        gap: .4rem;
+        overflow-x: auto;
+        padding-bottom: .5rem;
+        scrollbar-width: thin;
+
+        .nav-item {
+            flex: 0 0 auto;
+        }
+
+        .nav-link {
+            overflow: hidden;
+            max-width: 15rem;
+            padding: .4rem .9rem;
+            font-size: .875rem;
+            font-style: normal;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+
+    // On the page of an activity the breadcrumb is the way back: the line with the course, the kind
+    // of activity and the route of the section would say it three times. Same for the icon tile.
+    .rsmax-stage:not(.rsmax-stage-section) .rsmax-stage-top,
+    .rsmax-stage:not(.rsmax-stage-section) .rsmax-stage-route,
+    .rsmax-stage-section .rsmax-stage-top,
+    .rsmax-stage #page-header .page-header-image {
+        display: none;
+    }
+
+    // The header of the course is repeated on every tab: kept short.
+    .rsmax-coursehero-inner {
+        gap: .75rem 2rem;
+        padding-top: 1.1rem;
+        padding-bottom: 1.1rem;
+    }
+
+    .rsmax-coursehero-title {
+        max-width: 30ch;
+        font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+    }
+
+    .rsmax-ring {
+        width: 4rem;
+        height: 4rem;
+    }
+
+    .rsmax-ring-figure {
+        font-size: 1.25rem;
     }
 }

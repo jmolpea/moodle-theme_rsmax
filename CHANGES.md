@@ -1,5 +1,34 @@
 # Changes
 
+## 1.4.1 (2026-11-13)
+
+- A site that upgrades from a version before 1.4 keeps the look of its courses: the classroom stays off until the administrator turns it on, in the Courses tab of the theme settings. A new site has it on.
+- Fixed: rubric tables in the content of a course (`rsx-table--rubric`) fit the width of the page. The second column was kept on one line, so a table with long descriptors grew wider than the page and its last columns could not be read. The criterion takes 22% of the width, the levels share the rest and long words wrap.
+- An activity with the tag `progreso:no` or `progress:no` does not count as a step of its module. It is for an activity that only some learners complete, such as the choice of a path: without the tag the module never showed as completed for the others.
+- The button that holds the course tabs that do not fit in one line is translated: its label was in Spanish on every site.
+- The label of the assistant's suggested questions and the name of the captions track of a video are translated: they were in Spanish on every site.
+- The header of a course with a banner lets more of the image through.
+- New piece for the content of a page: `rsx-materials`, a box of links to the files of a lesson or a module.
+- The two icons of the classroom are files of the theme instead of images written inside the stylesheet.
+- The code of the classroom follows Moodle's coding style and its JavaScript is built with Moodle's own tools.
+
+## 1.4.0 (2026-11-05)
+
+- RSMAX classroom: the design of the theme inside every course. Light pages, the «your next step» header with the map of modules, areas, the presentation of each module and the type and duration of each activity. It is a setting of the theme (Courses tab), on in a new site. The choice between stage and light pages in «Banners» is only offered when the classroom is off.
+- The «your next step» header and the map of modules work with any number of modules: every section but the general one. A module shows its code when its name starts with one («M1 · …»), and its number otherwise.
+- Presentation of the module: a photo or a video (a file, YouTube or Vimeo, or a «video coming soon» box), a line above the text, the text, an optional full text and the card «About this module». It is filled in with fields from «Add presentation of the module», in edit mode, and is shown at the top of the module with the same design in every course. A video file can go with its subtitles in a `.vtt` file. The presentation travels in course backups and is deleted with its course or section.
+- Type and duration of each activity. The type comes from the kind of activity (a page is a reading, an assignment is assessed, a quiz with no grade is practice) and can be changed with a tag on the activity: `tipo:hito` or `type:milestone`. The duration is a tag too: `duracion:30min`, `duration:1.5h`.
+- For learners, in every course: the tabs «Course» and «My submissions», the panel of the submission on assignments, suggested questions for the AI assistant and long briefs that open with «Read more».
+- The styles of the classroom are in `scss/aula.scss` and `scss/aula-sitio.scss`.
+
+## 1.3.0 (2026-11-04)
+
+- Each course chooses the look of its pages in «Banners»: stage, with a dark panel at the top of every section and activity, or light, with headers, the course index and the bar between pages on the paper of the page.
+- The header of the course home follows the module on screen: its title, its progress and its next step. A completed module points to the next one and a locked module says what opens it.
+- Map of modules in the header of the course: one cell for each module with its state (completed, in progress, not started or locked) and how many modules are completed.
+- Areas: an area groups the activities placed under it, up to the next area, under a heading that folds. «Add area» is on every module in edit mode, the area is dragged like any activity and it is shown as a subheading in the course index. An area is a «Text and media area», so it changes neither sections, restrictions nor completion.
+- When the tabs of a course do not fit in one line, the ones left over open from a button at the end of the line instead of wrapping.
+
 ## 1.2.3 (2026-10-13)
 
 - The theme settings say where the light and dark colour modes are switched on.

@@ -25,6 +25,15 @@ Feature: Follow a course with the RSMAX theme
   Scenario: The course page shows the progress of the student and where to continue
     When I am on the "Project management" course page logged in as student1
     Then I should see "Project management" in the ".rsmax-coursehero" "css_element"
+    And I should see "Your progress in the course" in the ".rsmax-coursehero" "css_element"
+    And I should see "0 of 1 modules completed" in the ".rsmax-coursehero" "css_element"
+    And I should see "What is a project" in the ".rsmax-coursehero" "css_element"
+
+  Scenario: With the classroom off the course page keeps the header of the stage
+    Given the following config values are set as admin:
+      | classroom | 0 | theme_rsmax |
+    When I am on the "Project management" course page logged in as student1
+    Then I should see "Project management" in the ".rsmax-coursehero" "css_element"
     And I should see "Marta Soler" in the ".rsmax-coursehero" "css_element"
     And I should see "Your progress" in the ".rsmax-coursehero" "css_element"
     And I should see "0 of 2 activities completed" in the ".rsmax-coursehero" "css_element"
