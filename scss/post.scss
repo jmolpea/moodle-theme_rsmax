@@ -4412,7 +4412,9 @@ body.rsmax-hassectionstage:not(.editing) .single-section > ul > .course-section 
     }
 
     // A section with a banner: its header carries the picture.
-    .course-section.rsmax-hasbanner > .section-item > .course-section-header {
+    // Formats without the wrapper of the section (tabs, one section per page) put the header right inside it.
+    .course-section.rsmax-hasbanner > .section-item > .course-section-header,
+    .course-section.rsmax-hasbanner > .course-section-header {
         min-height: 6.5rem;
         margin-bottom: .75rem;
         color: $white;
@@ -4519,7 +4521,8 @@ body:not(.editing) .course-content {
         background: rgba($white, .16);
     }
 
-    .course-section.rsmax-hasbanner > .section-item > .course-section-header[data-rsmax-number]::before {
+    .course-section.rsmax-hasbanner > .section-item > .course-section-header[data-rsmax-number]::before,
+    .course-section.rsmax-hasbanner > .course-section-header[data-rsmax-number]::before {
         -webkit-text-stroke-color: rgba($white, .55);
     }
 

@@ -198,6 +198,25 @@ const rateDiscussions = () => {
     });
 };
 
+/**
+ * Takes the learner straight to the form when they open an assignment to hand in their work.
+ *
+ * The description, the files of the teacher and the status table come before the form, so
+ * without this the page opens far from what the learner came to do.
+ */
+const goToSubmission = () => {
+    if (window.location.hash) {
+        return;
+    }
+    const form = document.querySelector('#region-main form.mform');
+    if (!form) {
+        return;
+    }
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    form.style.scrollMarginTop = '5rem';
+    form.scrollIntoView({block: 'start', behavior: reduce ? 'auto' : 'smooth'});
+};
+
 let started = false;
 
 /**
@@ -214,6 +233,9 @@ export const init = () => {
         followAnswers(questions);
     } else if (questions.length && body.id === 'page-mod-quiz-review') {
         showResult(questions);
+    }
+    if (body.id === 'page-mod-assign-editsubmission') {
+        goToSubmission();
     }
     if (body.classList.contains('path-mod-forum')) {
         markOwnPosts();

@@ -1,5 +1,10 @@
 # Changes
 
+## 1.4.2 (2026-11-14)
+
+- Fixed: the banners of the sections were not shown in course formats without the wrapper of the section, such as tabs (Onetopic) or one section per page. Only the banner of the course was seen.
+- «Add submission» on an assignment opens the page at the submission form, instead of at the top of the description.
+
 ## 1.4.1 (2026-11-13)
 
 - A site that upgrades from a version before 1.4 keeps the look of its courses: the classroom stays off until the administrator turns it on, in the Courses tab of the theme settings. A new site has it on.
