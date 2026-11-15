@@ -5,6 +5,7 @@
 - Fixed: the presentation of a hidden or locked module was sent inside the course page, and its files were served, to people who could not open that module. Only the presentations of the modules a person may open are sent now; teachers still see them all.
 - Fixed: the banner uploaded for a course was not shown on the enrolment page to people who are not in the course yet. It is served the way Moodle serves the picture of a course.
 - Fixed: the one-line fields of the presentation of a module say when a text is too long, instead of failing when saved.
+- Fixed: the form of the presentation of a module failed to open with «Undefined constant EDITOR_UNLIMITED_FILES».
 - Adding an area asks for the permission to add a «Text and media area» too.
 - A colour setting only takes three, six or eight hexadecimal digits.
 - A backup merged into an existing course no longer replaces where its banner is shown or the look of its pages.

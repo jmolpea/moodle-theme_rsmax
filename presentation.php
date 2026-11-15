@@ -23,6 +23,8 @@
  */
 
 require(__DIR__ . '/../../config.php');
+// The options of the editors are prepared before the form is: they need the constants of the forms library.
+require_once($CFG->libdir . '/formslib.php');
 
 use theme_rsmax\local\section_presentation;
 
