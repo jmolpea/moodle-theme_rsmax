@@ -296,9 +296,18 @@ define('theme_rsmax/aula', [], function() {
 
     return {
         /**
-         * @param {Object} data meta, step, assign, strings and presentations
+         * @param {Object} data meta, step, assign, strings and presentations; left out, they are
+         *     read from the page, where the layout leaves them in #rsmax-auladata
          */
         init: function(data) {
+            if (!data) {
+                var store = document.getElementById('rsmax-auladata');
+                try {
+                    data = store ? JSON.parse(store.textContent) : {};
+                } catch (error) {
+                    data = {};
+                }
+            }
             data = data || {};
             S = data.strings || {};
             var meta = data.meta || {};

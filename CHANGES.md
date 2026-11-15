@@ -6,6 +6,7 @@
 - Fixed: the banner uploaded for a course was not shown on the enrolment page to people who are not in the course yet. It is served the way Moodle serves the picture of a course.
 - Fixed: the one-line fields of the presentation of a module say when a text is too long, instead of failing when saved.
 - Fixed: the form of the presentation of a module failed to open with «Undefined constant EDITOR_UNLIMITED_FILES».
+- The data of the classroom script waits in the page instead of travelling as the arguments of its call, which Moodle warned about on courses with many activities («Too much data passed as arguments to js_call_amd»). Nothing changes on screen.
 - Adding an area asks for the permission to add a «Text and media area» too.
 - A colour setting only takes three, six or eight hexadecimal digits.
 - A backup merged into an existing course no longer replaces where its banner is shown or the look of its pages.

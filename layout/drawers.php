@@ -501,6 +501,7 @@ if (isset($settings->footerhelp) && empty($settings->footerhelp)) {
 // Classroom: one vocabulary (names without codes, the type in words and the duration on every
 // list), the presentation of each module, the delivery panel of the tasks and the assistant's prompts.
 $presentationshtml = '';
+$aulajson = '';
 if ($aula) {
     $aulastrings = [];
     foreach (
@@ -578,13 +579,16 @@ if ($aula) {
             ];
         }
     }
-    $PAGE->requires->js_call_amd('theme_rsmax/aula', 'init', [[
+    // What theme_rsmax/aula works with waits in the page, as the data of theme_rsmax/course does:
+    // a course with many activities is too much to pass as the arguments of the call.
+    $aulajson = json_encode([
         'meta' => (object) ($PAGE->user_is_editing() ? [] : $aulameta),
         'step' => $aulastep,
         'assign' => $PAGE->cm && $PAGE->cm->modname === 'assign' && !$PAGE->user_is_editing(),
         'strings' => $aulastrings,
         'presentations' => $presentations,
-    ]]);
+    ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
+    $PAGE->requires->js_call_amd('theme_rsmax/aula', 'init');
 }
 // Areas: labels marked as areas become headings that group the activities under them. They are
 // presentation only: sections, restrictions and completion stay intact (theme_rsmax\local\course_areas).
@@ -651,6 +655,7 @@ $templatecontext = [
     'assistantholder' => $assistantholder,
     'homehero' => $homehero,
     'presentationshtml' => $presentationshtml,
+    'aulajson' => $aulajson,
 ];
 
 echo $OUTPUT->render_from_template('theme_rsmax/drawers', $templatecontext);
