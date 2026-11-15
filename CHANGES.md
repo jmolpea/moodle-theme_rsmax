@@ -1,5 +1,16 @@
 # Changes
 
+## 1.4.3 (2026-11-15)
+
+- Fixed: the presentation of a hidden or locked module was sent inside the course page, and its files were served, to people who could not open that module. Only the presentations of the modules a person may open are sent now; teachers still see them all.
+- Fixed: the banner uploaded for a course was not shown on the enrolment page to people who are not in the course yet. It is served the way Moodle serves the picture of a course.
+- Fixed: the one-line fields of the presentation of a module say when a text is too long, instead of failing when saved.
+- Adding an area asks for the permission to add a «Text and media area» too.
+- A colour setting only takes three, six or eight hexadecimal digits.
+- A backup merged into an existing course no longer replaces where its banner is shown or the look of its pages.
+- The description of «Show progress by section» says it needs the course progress, and the one of the palettes how to apply the same palette again.
+- A link to the configuration manual at the top of the theme settings and of the banners page of a course.
+
 ## 1.4.2 (2026-11-14)
 
 - Fixed: the banners of the sections were not shown in course formats without the wrapper of the section, such as tabs (Onetopic) or one section per page. Only the banner of the course was seen.

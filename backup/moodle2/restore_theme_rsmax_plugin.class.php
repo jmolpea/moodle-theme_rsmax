@@ -61,9 +61,16 @@ class restore_theme_rsmax_plugin extends restore_theme_plugin {
      * @param array|stdClass $data Data of the element.
      */
     public function process_theme_rsmax_course($data) {
+        global $DB;
+
         $data = (object) $data;
-        \theme_rsmax\local\banner::set_scope($this->task->get_courseid(), (int) ($data->bannerscope ?? 0));
-        \theme_rsmax\local\banner::set_style($this->task->get_courseid(), (int) ($data->pagestyle ?? 0));
+        $courseid = $this->task->get_courseid();
+        // A backup merged into a course that already chose its options adds content: it does not undo them.
+        $merging = in_array($this->task->get_target(), [backup::TARGET_CURRENT_ADDING, backup::TARGET_EXISTING_ADDING]);
+        if (!$merging || !$DB->record_exists('theme_rsmax_course', ['courseid' => $courseid])) {
+            \theme_rsmax\local\banner::set_scope($courseid, (int) ($data->bannerscope ?? 0));
+            \theme_rsmax\local\banner::set_style($courseid, (int) ($data->pagestyle ?? 0));
+        }
         $this->add_related_files('theme_rsmax', 'coursebanner', null);
     }
 

@@ -41,7 +41,8 @@ pages. A setting adds a floating button that opens it. The theme works the same 
 ## Privacy
 
 The theme stores no personal data. It keeps, for each course, the banners uploaded by its
-teachers and where they are shown.
+teachers and where they are shown, the look of its pages and the presentation its teachers
+write for each module (a photo or a video and its texts).
 
 Nothing is requested from other sites when a page loads. The font (Inter) is bundled with the
 theme. Two things reach an external service, and only after the visitor presses them:

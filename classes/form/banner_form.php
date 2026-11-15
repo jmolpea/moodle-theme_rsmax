@@ -42,6 +42,14 @@ class banner_form extends \moodleform {
         $mform->addElement('hidden', 'sectionid');
         $mform->setType('sectionid', PARAM_INT);
 
+        // The configuration manual of the theme, before the fields.
+        $mform->addElement(
+            'static',
+            'manuallink',
+            get_string('manuallink', 'theme_rsmax'),
+            \theme_rsmax\local\manual::link()
+        );
+
         $label = $sectionname === ''
             ? get_string('bannercourse', 'theme_rsmax')
             : get_string('bannersection', 'theme_rsmax', $sectionname);

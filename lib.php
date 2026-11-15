@@ -195,7 +195,8 @@ function theme_rsmax_get_pre_scss($theme) {
 
     foreach (THEME_RSMAX_COLOURS as $setting => $spec) {
         $value = $settings->{$setting} ?? '';
-        if (preg_match('/^#[0-9a-fA-F]{3,8}$/', $value)) {
+        // Three, six or eight digits: anything else is not a colour and would break the stylesheet.
+        if (preg_match('/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/', $value)) {
             $scss .= '$' . $spec['variable'] . ': ' . $value . ";\n";
         }
     }
@@ -318,6 +319,8 @@ function theme_rsmax_parse_links(string $lines, context $context): array {
  * @return bool
  */
 function theme_rsmax_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
+    global $CFG;
+
     if ($context->contextlevel == CONTEXT_SYSTEM && in_array($filearea, THEME_RSMAX_FILEAREAS)) {
         $theme = theme_config::load('rsmax');
         if (!array_key_exists('cacheability', $options)) {
@@ -325,10 +328,16 @@ function theme_rsmax_pluginfile($course, $cm, $context, $filearea, $args, $force
         }
         return $theme->setting_file_serve($filearea, $args, $forcedownload, $options);
     }
-    // Banners of a course and of its sections: for whoever may enter the course.
+    // Banners of the sections: for whoever may enter the course. The banner of the course also opens
+    // the page where somebody who is not in the course yet decides to join it, so it is served the
+    // way Moodle serves the picture of a course: to anybody the site lets in.
     $areas = [\theme_rsmax\local\banner::AREA_COURSE, \theme_rsmax\local\banner::AREA_SECTION];
     if ($context->contextlevel == CONTEXT_COURSE && in_array($filearea, $areas) && count($args) == 3) {
-        require_course_login($course, true, null, false, true);
+        if ($filearea != \theme_rsmax\local\banner::AREA_COURSE) {
+            require_course_login($course, true, null, false, true);
+        } else if (!empty($CFG->forcelogin)) {
+            require_login(null, true, null, false, true);
+        }
         // The second part of the path is the time of the file: it only keeps old copies out of caches.
         $file = get_file_storage()->get_file($context->id, 'theme_rsmax', $filearea, (int) $args[0], '/', $args[2]);
         if ($file && !$file->is_directory()) {
@@ -343,6 +352,10 @@ function theme_rsmax_pluginfile($course, $cm, $context, $filearea, $args, $force
     if ($context->contextlevel == CONTEXT_COURSE && in_array($filearea, $presentationareas) && count($args) >= 2) {
         require_course_login($course, true, null, false, true);
         $itemid = (int) array_shift($args);
+        // The item is the section: what a hidden or locked section presents is not for those who cannot open it.
+        if (!\theme_rsmax\local\section_presentation::section_visible($course, $itemid)) {
+            send_file_not_found();
+        }
         $filename = array_pop($args);
         if ($filearea == \theme_rsmax\local\section_presentation::AREA_MEDIA) {
             // The first part of the path of the photo or the video is its time: it only keeps old copies out of caches.

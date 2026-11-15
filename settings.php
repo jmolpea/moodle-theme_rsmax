@@ -70,6 +70,12 @@ if ($ADMIN->fulltree) {
             }
         }
     };
+    // The configuration manual, first thing on the first page.
+    $page->add(new admin_setting_heading(
+        'theme_rsmax/manuallink',
+        $name('manuallink'),
+        \theme_rsmax\local\manual::description()
+    ));
     $add($page, $heading('paletteinfo'));
     $palettes = ['custom' => get_string('palette:custom', 'theme_rsmax')];
     foreach (array_keys(THEME_RSMAX_PALETTES) as $palette) {

@@ -31,6 +31,8 @@ $course = get_course($courseid);
 require_login($course);
 $context = context_course::instance($course->id);
 require_capability('moodle/course:manageactivities', $context);
+// An area is a «Text and media area»: whoever may not add one may not add an area either.
+require_capability('mod/label:addinstance', $context);
 $section = get_fast_modinfo($course)->get_section_info($sectionnum, MUST_EXIST);
 
 $returnurl = course_get_url($course, $sectionnum);

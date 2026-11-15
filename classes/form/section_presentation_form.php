@@ -80,6 +80,12 @@ class section_presentation_form extends \moodleform {
         $mform->setType('about_editor', PARAM_RAW);
         $mform->addHelpButton('about_editor', 'presentation:about', 'theme_rsmax');
 
+        // The one-line fields are kept in columns of a fixed length: say so before the database does.
+        $lengths = ['videourl' => 1333, 'videoplaceholder' => 255, 'heading' => 255, 'abouttitle' => 255, 'aboutsummary' => 255];
+        foreach ($lengths as $field => $length) {
+            $mform->addRule($field, get_string('maximumchars', '', $length), 'maxlength', $length, 'client');
+        }
+
         if (!empty($this->_customdata['exists'])) {
             $mform->addElement('header', 'deleteheader', get_string('presentation:remove', 'theme_rsmax'));
             $mform->addElement(

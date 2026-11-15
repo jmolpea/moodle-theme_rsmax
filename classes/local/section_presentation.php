@@ -138,7 +138,25 @@ class section_presentation {
     }
 
     /**
+     * Whether the person looking may open a section, and so see what presents it.
+     *
+     * A hidden section, or one still locked by a restriction, is closed to a learner; whoever
+     * may see hidden sections, such as its teachers, sees them all.
+     *
+     * @param stdClass $course
+     * @param int $sectionid
+     * @return bool False as well when the course has no such section.
+     */
+    public static function section_visible(stdClass $course, int $sectionid): bool {
+        $section = get_fast_modinfo($course)->get_section_info_by_id($sectionid);
+        return $section !== null && $section->uservisible;
+    }
+
+    /**
      * What the template theme_rsmax/section_presentation needs for each section of a course.
+     *
+     * Only the sections the person looking may open: the page carries the presentations in its
+     * HTML, so one of a hidden or locked section must not travel with it.
      *
      * @param stdClass $course
      * @return array sectionid => context
@@ -146,6 +164,7 @@ class section_presentation {
     public static function export_for_course(stdClass $course): array {
         global $DB;
         $records = $DB->get_records('theme_rsmax_section', ['courseid' => $course->id]);
+        $records = array_filter($records, fn($record) => self::section_visible($course, (int) $record->sectionid));
         if (!$records) {
             return [];
         }
